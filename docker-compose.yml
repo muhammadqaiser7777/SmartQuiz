@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  # Redis for live leaderboard & timers
+  redis:
+    image: redis:alpine
+    container_name: quiz_redis
+    ports:
+      - "6379:6379"
+
+  # local Postgres (You said you have it installed, but running it in 
+  # Docker ensures your colleague has the exact same version/setup)
+  db:
+    image: postgres:15
+    container_name: quiz_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Postgres582.
+      POSTGRES_DB: smart_quiz
+    ports:
+      - "5432:5432"
