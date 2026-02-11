@@ -1,0 +1,6 @@
+backend/.env
+docker-compose.yaml
+node_modules/
+dist/
+.angular/
+.vscode/
