@@ -18,7 +18,9 @@ COPY package*.json ./
 RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
+COPY drizzle.config.ts ./
+COPY src/db ./src/db
 
 EXPOSE 2001
 
-CMD ["node", "dist/main"]
+CMD npx drizzle-kit push && node dist/src/main.js

@@ -4,31 +4,32 @@ import * as schema from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { LoginDto } from './dto/login.dto';
 import { CryptoUtil } from '../utils/crypto.util';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AdminService {
     constructor(
         @Inject('DRIZZLE_DB')
         private db: NodePgDatabase<typeof schema>,
+        private jwtService: JwtService,
     ) { }
 
     async login(loginDto: LoginDto) {
         const { username, password } = loginDto;
 
-        // Encrypt incoming password to match stored password
-        const encryptedPassword = CryptoUtil.encrypt(password);
-
         const admin = await this.db.query.admins.findFirst({
             where: eq(schema.admins.username, username),
         });
 
-        if (!admin || admin.password !== encryptedPassword) {
+        if (!admin || !CryptoUtil.compare(password, admin.password)) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        // Usually you'd return a JWT here, but for now we'll return a success message
+        const payload = { sub: admin.id, username: admin.username };
+
         return {
             message: 'Login successful',
+            access_token: this.jwtService.sign(payload),
             admin: {
                 id: admin.id,
                 username: admin.username,
