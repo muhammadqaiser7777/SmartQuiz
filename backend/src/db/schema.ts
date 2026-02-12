@@ -2,7 +2,6 @@ import { pgTable, serial, text, timestamp, uuid, integer, unique, pgEnum } from 
 
 export const correctOptionEnum = pgEnum('correct_option', ['1', '2', '3', '4']);
 
-
 export const admins = pgTable('admins', {
     id: serial('id').primaryKey(),
     username: text('username').notNull().unique(),
@@ -16,7 +15,7 @@ export const teachers = pgTable('teachers', {
     name: text('name').notNull(),
     email: text('email').notNull().unique(),
     authId: text('auth_id').notNull().unique(),
-    authProvider: text('auth_provider').notNull(), // 'google' | 'microsoft'
+    authProvider: text('auth_provider').notNull(),
     profilePicture: text('profile_picture'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),

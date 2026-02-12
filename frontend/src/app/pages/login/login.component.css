@@ -1,0 +1,160 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top left, #1a1a2e, #16213e);
+    font-family: 'Inter', sans-serif;
+    padding: 1rem;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.login-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+}
+
+.login-header p {
+    color: #94a3b8;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Role Slider */
+.role-slider-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+}
+
+.role-slider {
+    position: relative;
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    padding: 4px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.role-slider button {
+    flex: 1;
+    border: none;
+    background: none;
+    color: #94a3b8;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.role-slider button.active {
+    color: white;
+}
+
+.slider-indicator {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 100px;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1;
+}
+
+.teacher-selected .slider-indicator {
+    transform: translateX(100%);
+}
+
+/* OAuth Buttons */
+.login-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.oauth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-weight: 500;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.oauth-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.oauth-btn:active {
+    transform: translateY(0);
+}
+
+.oauth-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 2rem;
+    }
+
+    .login-header h1 {
+        font-size: 2.5rem;
+    }
+}
