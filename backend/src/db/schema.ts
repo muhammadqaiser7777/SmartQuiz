@@ -43,6 +43,46 @@ export const classes = pgTable('classes', {
     name: text('name').notNull().unique(),
 });
 
+export const classCourses = pgTable('class_courses', {
+    id: serial('id').primaryKey(),
+    classId: integer('class_id').notNull().references(() => classes.id, { onDelete: 'cascade' }),
+    courseId: integer('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+}, (t) => ({
+    unq: unique().on(t.classId, t.courseId),
+}));
+
+export const classTeachers = pgTable('class_teachers', {
+    id: serial('id').primaryKey(),
+    classId: integer('class_id').notNull().references(() => classes.id, { onDelete: 'cascade' }),
+    teacherId: uuid('teacher_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
+}, (t) => ({
+    unq: unique().on(t.classId, t.teacherId),
+}));
+
+export const classStudents = pgTable('class_students', {
+    id: serial('id').primaryKey(),
+    classId: integer('class_id').notNull().references(() => classes.id, { onDelete: 'cascade' }),
+    studentId: uuid('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
+}, (t) => ({
+    unq: unique().on(t.classId, t.studentId),
+}));
+
+export const courseTeachers = pgTable('course_teachers', {
+    id: serial('id').primaryKey(),
+    courseId: integer('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+    teacherId: uuid('teacher_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
+}, (t) => ({
+    unq: unique().on(t.courseId, t.teacherId),
+}));
+
+export const courseStudents = pgTable('course_students', {
+    id: serial('id').primaryKey(),
+    courseId: integer('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+    studentId: uuid('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
+}, (t) => ({
+    unq: unique().on(t.courseId, t.studentId),
+}));
+
 export const classCourseTeacher = pgTable('class_course_teacher', {
     id: serial('id').primaryKey(),
     classId: integer('class_id').notNull().references(() => classes.id, { onDelete: 'cascade' }),
