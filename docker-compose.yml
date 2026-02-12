@@ -1,0 +1,73 @@
+services:
+  backend:
+    build: ./backend
+    container_name: smartquiz-backend
+    ports:
+      - "2001:2001"
+    env_file:
+      - ./backend/.env
+    environment:
+      - RUNNING_IN_DOCKER=true
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - smartquiz-network
+
+  frontend:
+    build: ./frontend
+    container_name: smartquiz-frontend
+    ports:
+      - "2002:2002"
+    depends_on:
+      - backend
+    networks:
+      - smartquiz-network
+
+  admin:
+    build: ./admin
+    container_name: smartquiz-admin
+    ports:
+      - "2005:2005"
+    depends_on:
+      - backend
+    networks:
+      - smartquiz-network
+
+  db:
+    image: postgres:17-alpine
+    container_name: smartquiz-db
+    environment:
+      POSTGRES_USER: smartquiz
+      POSTGRES_PASSWORD: smartquiz2!@
+      POSTGRES_DB: smartquiz
+    ports:
+      - "2003:2003"
+    command: ["postgres", "-p", "2003"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartquiz -d smartquiz -p 2003"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartquiz-network
+
+  redis:
+    image: redis:alpine
+    container_name: smartquiz-redis
+    ports:
+      - "2004:2004"
+    command: ["redis-server", "--port", "2004"]
+    networks:
+      - smartquiz-network
+
+networks:
+  smartquiz-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

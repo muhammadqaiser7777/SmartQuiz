@@ -1,0 +1,23 @@
+<div class="login-container">
+    <form class="login-card" (submit)="onLogin($event)">
+        <h2>Admin Login</h2>
+
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" [(ngModel)]="loginData.username" required
+                placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" [(ngModel)]="loginData.password" required
+                placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="login-btn">Sign In</button>
+
+        @if (errorMessage) {
+        <p class="error-msg">{{ errorMessage }}</p>
+        }
+    </form>
+</div>
