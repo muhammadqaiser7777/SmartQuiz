@@ -1,23 +1,37 @@
 <div class="dashboard-container">
+    <!-- Mobile Header with Hamburger -->
+    <div class="mobile-header">
+        <button class="hamburger-btn" (click)="toggleSidebar()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <h2>SmartQuiz Admin</h2>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" [class.open]="isSidebarOpen">
         <div class="sidebar-header">
             <h2>SmartQuiz Admin</h2>
         </div>
         <nav class="sidebar-nav">
-            <button [class.active]="currentView === 'home'" (click)="setView('home')">
+            <button [routerLink]="['/dashboard']" [routerLinkActive]="'active'"
+                [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
                 Home
             </button>
-            <button [class.active]="currentView === 'courses'" (click)="setView('courses')">
+            <button [routerLink]="['/dashboard/courses']" [routerLinkActive]="'active'" (click)="closeSidebar()">
                 Manage Courses
             </button>
-            <button [class.active]="currentView === 'classes'" (click)="setView('classes')">
+            <button [routerLink]="['/dashboard/classes']" [routerLinkActive]="'active'" (click)="closeSidebar()">
                 Manage Classes
             </button>
-            <button [class.active]="currentView === 'students'" (click)="setView('students')">
+            <button [routerLink]="['/dashboard/students']" [routerLinkActive]="'active'" (click)="closeSidebar()">
                 Manage Students
             </button>
-            <button [class.active]="currentView === 'teachers'" (click)="setView('teachers')">
+            <button [routerLink]="['/dashboard/teachers']" [routerLinkActive]="'active'" (click)="closeSidebar()">
                 Manage Teachers
             </button>
         </nav>
@@ -28,14 +42,6 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="welcome-message" *ngIf="currentView === 'home'">
-            <h1>Welcome to Admin Portal</h1>
-            <p>Select an option from the sidebar to manage your portal.</p>
-        </div>
-
-        <app-courses *ngIf="currentView === 'courses'"></app-courses>
-        <app-classes *ngIf="currentView === 'classes'"></app-classes>
-        <app-students *ngIf="currentView === 'students'"></app-students>
-        <app-teachers *ngIf="currentView === 'teachers'"></app-teachers>
+        <router-outlet></router-outlet>
     </main>
 </div>

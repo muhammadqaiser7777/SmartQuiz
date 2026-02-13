@@ -1,16 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../services/auth';
-import { Router } from '@angular/router';
-import { CoursesComponent } from '../courses/courses';
-import { ClassesComponent } from '../classes/classes';
-import { StudentsComponent } from '../students/students';
-import { TeachersComponent } from '../teachers/teachers';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, CoursesComponent, ClassesComponent, StudentsComponent, TeachersComponent],
+    imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css'
 })
@@ -18,10 +14,23 @@ export class DashboardComponent {
     private authService = inject(AuthService);
     private router = inject(Router);
 
-    currentView: 'home' | 'courses' | 'classes' | 'students' | 'teachers' = 'home';
+    currentRoute: string = 'dashboard';
+    isSidebarOpen: boolean = false;
 
-    setView(view: 'home' | 'courses' | 'classes' | 'students' | 'teachers') {
-        this.currentView = view;
+    constructor() {
+        this.router.events.subscribe(() => {
+            this.currentRoute = this.router.url.split('/')[1] || 'dashboard';
+            // Close sidebar on route change (mobile)
+            this.closeSidebar();
+        });
+    }
+
+    toggleSidebar() {
+        this.isSidebarOpen = !this.isSidebarOpen;
+    }
+
+    closeSidebar() {
+        this.isSidebarOpen = false;
     }
 
     logout() {

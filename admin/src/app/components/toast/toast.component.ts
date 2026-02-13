@@ -1,0 +1,68 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ToastService } from '../../services/toast.service';
+
+@Component({
+    selector: 'app-toast',
+    standalone: true,
+    imports: [CommonModule],
+    template: `
+        <div class="toast-container">
+            @for (toast of toastService.toastsSignal(); track toast.id) {
+                <div class="toast" [class]="toast.type">
+                    <span>{{ toast.message }}</span>
+                    <button (click)="toastService.remove(toast.id)">×</button>
+                </div>
+            }
+        </div>
+    `,
+    styles: [`
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success {
+            background: #22c55e;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `]
+})
+export class ToastComponent {
+    constructor(public toastService: ToastService) { }
+}

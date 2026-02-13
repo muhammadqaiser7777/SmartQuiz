@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router';
-// Change 'login.component' to just 'login' to match your file name
 import { LoginComponent } from './login/login';
-import { DashboardComponent } from './dashboard/dashboard'; // Assuming this exists or create it
+import { DashboardComponent } from './dashboard/dashboard';
+import { HomeComponent } from './home/home.component';
+import { CoursesComponent } from './courses/courses';
+import { ClassesComponent } from './classes/classes';
+import { StudentsComponent } from './students/students';
+import { TeachersComponent } from './teachers/teachers';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -9,7 +13,14 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: HomeComponent },
+      { path: 'courses', component: CoursesComponent },
+      { path: 'classes', component: ClassesComponent },
+      { path: 'students', component: StudentsComponent },
+      { path: 'teachers', component: TeachersComponent }
+    ]
   },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];

@@ -16,9 +16,42 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  validateForm(): boolean {
+    // Check if fields are non-empty
+    if (!this.loginData.username.trim()) {
+      this.errorMessage = 'Username is required';
+      return false;
+    }
+
+    if (!this.loginData.password.trim()) {
+      this.errorMessage = 'Password is required';
+      return false;
+    }
+
+    // Check if password is at least 8 characters
+    if (this.loginData.password.length < 8) {
+      this.errorMessage = 'Password must be at least 8 characters';
+      return false;
+    }
+
+    // Check if password contains an uppercase letter
+    if (!/[A-Z]/.test(this.loginData.password)) {
+      this.errorMessage = 'Password must contain at least one uppercase letter';
+      return false;
+    }
+
+    this.errorMessage = '';
+    return true;
+  }
 
   onLogin(event: Event) {
     event.preventDefault();
+
+    // Validate form before submitting
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.authService.login(this.loginData).subscribe({
       next: (response) => {
         localStorage.setItem('token', response.access_token);

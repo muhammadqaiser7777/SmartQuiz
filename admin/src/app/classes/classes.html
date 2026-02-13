@@ -1,0 +1,44 @@
+<div class="content-container">
+    <div class="header">
+        <h2>Manage Classes</h2>
+        <button class="create-btn" (click)="showCreateForm()">+ Create Class</button>
+    </div>
+
+    <!-- Create/Edit Form -->
+    <div class="form-container" *ngIf="showForm">
+        <input type="text" [(ngModel)]="formName" placeholder="Enter class name" class="form-input">
+        <div class="form-actions">
+            <button class="save-btn" (click)="saveClass()">
+                {{ editingId ? 'Update' : 'Create' }}
+            </button>
+            <button class="cancel-btn" (click)="cancelForm()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="loading">
+        <p>Loading classes...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="error && !loading">
+        <p>{{ error }}</p>
+        <button (click)="loadClasses()">Retry</button>
+    </div>
+
+    <!-- Classes List -->
+    <div class="list-container" *ngIf="!loading && !error">
+        <div class="empty-state" *ngIf="classes.length === 0">
+            <p>No classes found. Create your first class!</p>
+        </div>
+        <div class="item-card" *ngFor="let cls of classes">
+            <div class="item-info">
+                <span class="item-name">{{ cls.name }}</span>
+            </div>
+            <div class="item-actions">
+                <button class="edit-btn" (click)="editClass(cls)">Edit</button>
+                <button class="delete-btn" (click)="deleteClass(cls.id)">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
