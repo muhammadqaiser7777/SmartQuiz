@@ -15,19 +15,20 @@ export class LoginComponent implements OnInit {
     private route = inject(ActivatedRoute);
 
     ngOnInit() {
-        // Check for token and role in URL query params (returned from backend callback)
         this.route.queryParams.subscribe(params => {
             const token = params['token'];
             const role = params['role'];
+            const name = params['name'];
+            const email = params['email'];
+            const picture = params['picture'];
 
             if (token && role) {
-                // Construct user object (in a real app, you might decode the JWT to get more info)
                 const user = {
                     role: role,
                     token: token,
-                    // We don't have name/email here without decoding, but dashboard fetches profile anyway
-                    name: 'User',
-                    email: ''
+                    name: name || 'User',
+                    email: email || '',
+                    picture: picture || ''
                 };
 
                 localStorage.setItem('user', JSON.stringify(user));
@@ -46,9 +47,7 @@ export class LoginComponent implements OnInit {
     }
 
     loginWithGoogle() {
-        // Redirect to backend to initiate Google OAuth flow
         const backendUrl = 'http://localhost:2001';
         window.location.href = `${backendUrl}/auth/google?state=${this.role()}`;
-        // Note: Using 'state' param to pass schema/role info to backend strategy
     }
 }

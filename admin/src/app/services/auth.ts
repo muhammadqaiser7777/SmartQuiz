@@ -7,8 +7,24 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   // Point this to your NestJS backend (AdminController route)
-  private apiUrl = 'http://localhost:3000/admin'; 
+  private apiUrl = 'http://localhost:2001/admin';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('admin');
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
 }

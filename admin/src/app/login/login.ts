@@ -18,17 +18,16 @@ export class LoginComponent {
 
 
   onLogin(event: Event) {
-    event.preventDefault(); // Stop page refresh
-
-    this.authService.login(this.loginData.username, this.loginData.password).subscribe({
+    event.preventDefault();
+    this.authService.login(this.loginData).subscribe({
       next: (response) => {
-        console.log('Login Success!', response);
-        // Navigate to a dashboard or home page after login
-        // this.router.navigate(['/dashboard']); 
+        localStorage.setItem('token', response.access_token);
+        localStorage.setItem('admin', JSON.stringify(response.admin));
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.errorMessage = 'Invalid username or password';
-        console.error('Login Error:', err);
+        console.error('Login failed', err);
       }
     });
   }

@@ -1,6 +1,10 @@
 <div class="dashboard-container">
     <div class="header">
         <h1>Teacher Dashboard</h1>
+        <div class="user-info" *ngIf="user">
+            <img [src]="user.picture" alt="Profile" *ngIf="user.picture" class="profile-pic">
+            <span>{{ user.name }}</span>
+        </div>
         <button (click)="logout()" class="logout-btn">Logout</button>
     </div>
     <p>Manage your courses and classes here.</p>

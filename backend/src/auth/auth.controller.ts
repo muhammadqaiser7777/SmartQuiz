@@ -27,16 +27,21 @@ export class AuthController {
         const role = user.role; // This was set in GoogleStrategy validate
 
         let result;
+        let userData;
         if (role === 'teacher') {
             result = await this.teacherService.loginOrSignupServerSide(user);
+            userData = result.teacher;
         } else {
             result = await this.studentService.loginOrSignupServerSide(user);
+            userData = result.student;
         }
 
-        // Redirect back to frontend with token and role
+        // Redirect back to frontend with token, role, and user details
         // Ensure this matches your Angular app's port (usually 4200 or 2002 as seen in angular.json)
         const frontendUrl = 'http://localhost:2002';
-        console.log(`Redirecting to: ${frontendUrl}/login?token=...&role=${role}`);
-        res.redirect(`${frontendUrl}/login?token=${result.access_token}&role=${role}`);
+        const redirectUrl = `${frontendUrl}/login?token=${result.access_token}&role=${role}&name=${encodeURIComponent(userData.name)}&email=${encodeURIComponent(userData.email)}&picture=${encodeURIComponent(userData.profilePicture)}`;
+
+        console.log(`Redirecting to: ${redirectUrl}`);
+        res.redirect(redirectUrl);
     }
 }

@@ -1,27 +1,39 @@
 .dashboard-container {
-    padding: 2rem;
-    color: white;
-    background: #1a1a2e;
-    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .logout-btn {
-    padding: 0.5rem 1rem;
-    background: #ef4444;
+    padding: 8px 16px;
+    background-color: #ff4d4d;
     color: white;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
 }
 
 .logout-btn:hover {
-    background: #dc2626;
+    background-color: #e60000;
 }

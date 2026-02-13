@@ -8,7 +8,15 @@ import { Router } from '@angular/router';
   styleUrl: './teacher-dashboard.component.css'
 })
 export class TeacherDashboardComponent {
+  user: any;
   private router = inject(Router);
+
+  constructor() {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      this.user = JSON.parse(userStr);
+    }
+  }
 
   logout() {
     localStorage.removeItem('user');
