@@ -1,0 +1,47 @@
+<div class="content-container">
+    <div class="header">
+        <h2>Manage Students</h2>
+        <button class="btn-primary">Add New Student</button>
+    </div>
+
+    <div class="search-section">
+        <input type="text" class="search-input" placeholder="Search students...">
+        <button class="btn-secondary">Search</button>
+    </div>
+
+    <div class="students-table">
+        <div *ngIf="loading" class="loading">Loading students...</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
+
+        <table *ngIf="!loading && !error">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Profile Picture</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="students.length === 0">
+                    <td colspan="5" class="no-data">No students found. Click "Add New Student" to get started.</td>
+                </tr>
+                <tr *ngFor="let student of students">
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>
+                        <img *ngIf="student.profilePicture" [src]="student.profilePicture" alt="Profile"
+                            class="profile-pic">
+                        <span *ngIf="!student.profilePicture">-</span>
+                    </td>
+                    <td>{{ student.createdAt | date:'short' }}</td>
+                    <td>
+                        <button class="btn-action">View</button>
+                        <button class="btn-action btn-danger">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

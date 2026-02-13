@@ -34,7 +34,7 @@ export class ClassesComponent implements OnInit {
         this.error = null;
         this.classesService.getClasses().subscribe({
             next: (data) => {
-                console.log('Classes loaded:', data);
+
                 this.classes = data;
                 this.loading = false;
                 this.cdr.detectChanges();

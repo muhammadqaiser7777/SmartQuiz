@@ -34,13 +34,12 @@ export class CoursesComponent implements OnInit {
         this.error = null;
         this.coursesService.getCourses().subscribe({
             next: (data) => {
-                console.log('Courses loaded:', data);
                 this.courses = data;
                 this.loading = false;
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading courses:', err);
+                console.error('Error loading courses:', err); 
                 this.error = 'Failed to load courses';
                 this.loading = false;
                 this.cdr.detectChanges();

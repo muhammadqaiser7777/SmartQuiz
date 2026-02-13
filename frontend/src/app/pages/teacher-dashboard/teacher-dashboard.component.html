@@ -5,5 +5,108 @@
             <app-user-menu></app-user-menu>
         </div>
     </div>
-    <p>Manage your courses and classes here.</p>
+
+    <div class="content-section">
+        <div class="section-header">
+            <h2>My Courses</h2>
+            <button class="btn-primary">Create New Course</button>
+        </div>
+
+        <div class="courses-grid">
+            <div class="course-card">
+                <div class="card-header">
+                    <h3>Mathematics 101</h3>
+                    <span class="badge">Active</span>
+                </div>
+                <p class="card-description">Introduction to Algebra and Calculus</p>
+                <div class="card-stats">
+                    <div class="stat">
+                        <span class="stat-label">Students</span>
+                        <span class="stat-value">45</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Assignments</span>
+                        <span class="stat-value">12</span>
+                    </div>
+                </div>
+                <button class="btn-secondary">View Details</button>
+            </div>
+
+            <div class="course-card">
+                <div class="card-header">
+                    <h3>Physics 201</h3>
+                    <span class="badge">Active</span>
+                </div>
+                <p class="card-description">Advanced Physics Concepts</p>
+                <div class="card-stats">
+                    <div class="stat">
+                        <span class="stat-label">Students</span>
+                        <span class="stat-value">32</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Assignments</span>
+                        <span class="stat-value">8</span>
+                    </div>
+                </div>
+                <button class="btn-secondary">View Details</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="section-header">
+            <h2>Recent Assignments</h2>
+            <button class="btn-primary">Create Assignment</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Course</th>
+                        <th>Due Date</th>
+                        <th>Submissions</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Midterm Exam</td>
+                        <td>Mathematics 101</td>
+                        <td>2026-02-20</td>
+                        <td>35/45</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>
+                            <button class="btn-action">View</button>
+                            <button class="btn-action">Grade</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Lab Report 3</td>
+                        <td>Physics 201</td>
+                        <td>2026-02-18</td>
+                        <td>28/32</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>
+                            <button class="btn-action">View</button>
+                            <button class="btn-action">Grade</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Quiz 5</td>
+                        <td>Mathematics 101</td>
+                        <td>2026-02-15</td>
+                        <td>45/45</td>
+                        <td><span class="status-badge completed">Completed</span></td>
+                        <td>
+                            <button class="btn-action">View</button>
+                            <button class="btn-action">Grade</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

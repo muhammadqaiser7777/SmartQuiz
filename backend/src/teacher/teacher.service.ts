@@ -70,4 +70,41 @@ export class TeacherService {
             ...token,
         };
     }
+
+    async createTeacher(name: string, email: string) {
+        // Check if teacher already exists
+        const existingTeacher = await this.db.query.teachers.findFirst({
+            where: eq(schema.teachers.email, email),
+        });
+
+        if (existingTeacher) {
+            throw new ForbiddenException('Teacher with this email already exists');
+        }
+
+        // Check if user is already registered as a student
+        const existingStudent = await this.db.query.students.findFirst({
+            where: eq(schema.students.email, email),
+        });
+
+        if (existingStudent) {
+            throw new ForbiddenException('This email is already registered as a student');
+        }
+
+        // Create new teacher
+        const [teacher] = await this.db.insert(schema.teachers).values({
+            name,
+            email,
+            authId: email, // Use email as authId for manually created teachers
+            authProvider: 'manual',
+        }).returning();
+
+        return {
+            message: 'Teacher created successfully',
+            teacher: {
+                id: teacher.id,
+                name: teacher.name,
+                email: teacher.email,
+            },
+        };
+    }
 }

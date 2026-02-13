@@ -12,6 +12,12 @@ export class StudentService {
         private db: NodePgDatabase<typeof schema>,
         private authService: AuthService,
     ) { }
+    async findAll() {
+    return await this.db.query.students.findMany({
+        orderBy: (students, { desc }) => [desc(students.createdAt)],
+    });
+}
+
 
     async loginOrSignupServerSide(user: any) {
         const email = user.email;
@@ -63,6 +69,43 @@ export class StudentService {
                 profilePicture: student.profilePicture,
             },
             ...token,
+        };
+    }
+
+    async createStudent(name: string, email: string) {
+        // Check if student already exists
+        const existingStudent = await this.db.query.students.findFirst({
+            where: eq(schema.students.email, email),
+        });
+
+        if (existingStudent) {
+            throw new ForbiddenException('Student with this email already exists');
+        }
+
+        // Check if user is already registered as a teacher
+        const existingTeacher = await this.db.query.teachers.findFirst({
+            where: eq(schema.teachers.email, email),
+        });
+
+        if (existingTeacher) {
+            throw new ForbiddenException('This email is already registered as a teacher');
+        }
+
+        // Create new student
+        const [student] = await this.db.insert(schema.students).values({
+            name,
+            email,
+            authId: email, // Use email as authId for manually created students
+            authProvider: 'manual',
+        }).returning();
+
+        return {
+            message: 'Student created successfully',
+            student: {
+                id: student.id,
+                name: student.name,
+                email: student.email,
+            },
         };
     }
 }

@@ -1,0 +1,47 @@
+<div class="content-container">
+    <div class="header">
+        <h2>Manage Teachers</h2>
+        <button class="btn-primary">Add New Teacher</button>
+    </div>
+
+    <div class="search-section">
+        <input type="text" class="search-input" placeholder="Search teachers...">
+        <button class="btn-secondary">Search</button>
+    </div>
+
+    <div class="teachers-table">
+        <div *ngIf="loading" class="loading">Loading teachers...</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
+
+        <table *ngIf="!loading && !error">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Profile Picture</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="teachers.length === 0">
+                    <td colspan="5" class="no-data">No teachers found. Click "Add New Teacher" to get started.</td>
+                </tr>
+                <tr *ngFor="let teacher of teachers">
+                    <td>{{ teacher.name }}</td>
+                    <td>{{ teacher.email }}</td>
+                    <td>
+                        <img *ngIf="teacher.profilePicture" [src]="teacher.profilePicture" alt="Profile"
+                            class="profile-pic">
+                        <span *ngIf="!teacher.profilePicture">-</span>
+                    </td>
+                    <td>{{ teacher.createdAt | date:'short' }}</td>
+                    <td>
+                        <button class="btn-action">View</button>
+                        <button class="btn-action btn-danger">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
