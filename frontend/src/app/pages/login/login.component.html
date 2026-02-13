@@ -5,6 +5,11 @@
             <p>Welcome back! Please sign in to continue.</p>
         </div>
 
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage()">
+            {{ errorMessage() }}
+        </div>
+
         <!-- Role Slider -->
         <div class="role-slider-container">
             <div class="role-slider" [class.teacher-selected]="role() === 'teacher'">

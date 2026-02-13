@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../db/schema';
 import { eq } from 'drizzle-orm';
@@ -20,6 +20,15 @@ export class TeacherService {
         const authId = user.id || email; // Google profile ID if available, otherwise email
 
         console.log('Teacher login attempt:', { email, name, profilePicture });
+
+        // Check if user is already registered as a student
+        const existingStudent = await this.db.query.students.findFirst({
+            where: eq(schema.students.email, email),
+        });
+
+        if (existingStudent) {
+            throw new ForbiddenException('You already have a student account, cannot login/signup as teacher');
+        }
 
         let teacher = await this.db.query.teachers.findFirst({
             where: eq(schema.teachers.email, email),

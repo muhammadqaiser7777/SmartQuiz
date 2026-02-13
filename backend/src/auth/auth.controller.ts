@@ -50,8 +50,9 @@ export class AuthController {
             res.redirect(redirectUrl);
         } catch (error) {
             console.error('Error in googleAuthRedirect:', error);
-            // Redirect to login with error
-            res.redirect('http://localhost:2002/login?error=auth_failed');
+            // Redirect to login with error message
+            const errorMessage = encodeURIComponent(error.message || 'Authentication failed');
+            res.redirect(`http://localhost:2002/login?error=${errorMessage}`);
         }
     }
 }

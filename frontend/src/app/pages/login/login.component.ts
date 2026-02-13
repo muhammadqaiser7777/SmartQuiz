@@ -11,6 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
     role = signal<'student' | 'teacher'>('student');
+    errorMessage = signal<string>('');
     private router = inject(Router);
     private route = inject(ActivatedRoute);
 
@@ -21,6 +22,13 @@ export class LoginComponent implements OnInit {
             const name = params['name'];
             const email = params['email'];
             const picture = params['picture'];
+            const error = params['error'];
+
+            // Handle error from backend
+            if (error) {
+                this.errorMessage.set(decodeURIComponent(error));
+                return;
+            }
 
             if (token && role) {
                 const user = {
@@ -44,6 +52,7 @@ export class LoginComponent implements OnInit {
 
     setRole(newRole: 'student' | 'teacher') {
         this.role.set(newRole);
+        this.errorMessage.set(''); // Clear error when role changes
     }
 
     loginWithGoogle() {
