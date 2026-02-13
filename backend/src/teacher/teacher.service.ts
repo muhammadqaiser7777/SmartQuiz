@@ -19,11 +19,14 @@ export class TeacherService {
         const profilePicture = user.picture;
         const authId = user.id || email; // Google profile ID if available, otherwise email
 
+        console.log('Teacher login attempt:', { email, name, profilePicture });
+
         let teacher = await this.db.query.teachers.findFirst({
             where: eq(schema.teachers.email, email),
         });
 
         if (!teacher) {
+            console.log('Creating new teacher:', { name, email, authId, profilePicture });
             [teacher] = await this.db.insert(schema.teachers).values({
                 name,
                 email,
@@ -31,7 +34,9 @@ export class TeacherService {
                 authProvider: 'google',
                 profilePicture,
             }).returning();
+            console.log('Created teacher:', teacher);
         } else {
+            console.log('Found existing teacher:', teacher);
             if (profilePicture && teacher.profilePicture !== profilePicture) {
                 await this.db.update(schema.teachers)
                     .set({ profilePicture, updatedAt: new Date() })

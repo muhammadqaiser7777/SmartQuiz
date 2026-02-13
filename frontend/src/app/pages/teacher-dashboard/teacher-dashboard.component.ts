@@ -1,25 +1,14 @@
-import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { UserMenuComponent } from '../../components/user-menu/user-menu.component';
 
 @Component({
   selector: 'app-teacher-dashboard',
   standalone: true,
+  imports: [CommonModule, UserMenuComponent],
   templateUrl: './teacher-dashboard.component.html',
   styleUrl: './teacher-dashboard.component.css'
 })
 export class TeacherDashboardComponent {
-  user: any;
-  private router = inject(Router);
-
-  constructor() {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      this.user = JSON.parse(userStr);
-    }
-  }
-
-  logout() {
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
-  }
+  // User data is now handled by the user-menu component
 }

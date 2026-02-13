@@ -16,6 +16,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
     async validate(req: any, accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
         const { name, emails, photos } = profile;
+        console.log('Google profile:', profile);
+        console.log('Request query:', req.query);
         const user = {
             email: emails[0].value,
             firstName: name.givenName,
@@ -26,6 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
             // Capture role from the 'state' parameter or query param if needed
             role: req.query.state || 'student'
         };
+        console.log('User after Google validation:', user);
         done(null, user);
     }
 }

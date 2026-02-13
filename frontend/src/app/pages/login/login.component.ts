@@ -26,9 +26,9 @@ export class LoginComponent implements OnInit {
                 const user = {
                     role: role,
                     token: token,
-                    name: name || 'User',
-                    email: email || '',
-                    picture: picture || ''
+                    name: name ? decodeURIComponent(name) : 'User',
+                    email: email ? decodeURIComponent(email) : '',
+                    picture: picture ? decodeURIComponent(picture) : ''
                 };
 
                 localStorage.setItem('user', JSON.stringify(user));
