@@ -1,7 +1,7 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../db/schema';
-import { eq, ilike } from 'drizzle-orm';
+import { eq, ilike, or } from 'drizzle-orm';
 
 export interface PaginatedResponse<T> {
     data: T[];
@@ -56,12 +56,47 @@ export class CoursesService {
         return course;
     }
 
+    async findByName(name: string, excludeId?: number): Promise<any> {
+        // Build where condition to check for existing name
+        let whereCondition: any;
+        if (excludeId) {
+            whereCondition = or(
+                ilike(schema.courses.name, name),
+                eq(schema.courses.name, name.toLowerCase()),
+                eq(schema.courses.name, name.toUpperCase()),
+            );
+            // Query and filter manually for excludeId
+            const existingCourses = await this.db.query.courses.findMany({
+                where: whereCondition,
+            });
+            return existingCourses.find(c => c.id !== excludeId) || null;
+        }
+        const [existingCourse] = await this.db.query.courses.findMany({
+            where: or(
+                ilike(schema.courses.name, name),
+                eq(schema.courses.name, name.toLowerCase()),
+                eq(schema.courses.name, name.toUpperCase()),
+            ),
+        });
+        return existingCourse || null;
+    }
+
     async create(name: string) {
+        // Check if course with same name already exists
+        const existingCourse = await this.findByName(name);
+        if (existingCourse) {
+            throw new ConflictException('Course with this name already exists');
+        }
         const [course] = await this.db.insert(schema.courses).values({ name }).returning();
         return course;
     }
 
     async update(id: number, name: string) {
+        // Check if course with same name already exists (excluding current id)
+        const existingCourse = await this.findByName(name, id);
+        if (existingCourse) {
+            throw new ConflictException('Course with this name already exists');
+        }
         const [course] = await this.db
             .update(schema.courses)
             .set({ name })

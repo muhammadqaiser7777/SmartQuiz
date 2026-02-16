@@ -100,6 +100,18 @@ export class CoursesComponent implements OnInit {
     saveCourse() {
         if (!this.formName.trim()) return;
 
+        // Frontend validation: Check for duplicate name
+        const trimmedName = this.formName.trim().toLowerCase();
+        const duplicateCourse = this.courses.find(c =>
+            c.name.toLowerCase() === trimmedName &&
+            c.id !== this.editingId
+        );
+
+        if (duplicateCourse) {
+            this.toastService.error('A course with this name already exists');
+            return;
+        }
+
         if (this.editingId) {
             this.coursesService.updateCourse(this.editingId, this.formName).subscribe({
                 next: (updatedCourse) => {
@@ -114,7 +126,12 @@ export class CoursesComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Error updating course:', err);
-                    this.toastService.error('Failed to update course');
+                    // Handle duplicate name error from backend
+                    if (err.status === 409) {
+                        this.toastService.error('A course with this name already exists');
+                    } else {
+                        this.toastService.error('Failed to update course');
+                    }
                 }
             });
         } else {
@@ -127,7 +144,12 @@ export class CoursesComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Error creating course:', err);
-                    this.toastService.error('Failed to create course');
+                    // Handle duplicate name error from backend
+                    if (err.status === 409) {
+                        this.toastService.error('A course with this name already exists');
+                    } else {
+                        this.toastService.error('Failed to create course');
+                    }
                 }
             });
         }

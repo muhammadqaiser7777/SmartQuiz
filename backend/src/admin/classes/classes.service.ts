@@ -1,7 +1,7 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../db/schema';
-import { eq, ilike } from 'drizzle-orm';
+import { eq, ilike, or } from 'drizzle-orm';
 
 export interface PaginatedResponse<T> {
     data: T[];
@@ -56,6 +56,31 @@ export class ClassesService {
         return classItem;
     }
 
+    async findByName(name: string, excludeId?: number): Promise<any> {
+        // Build where condition to check for existing name
+        let whereCondition: any;
+        if (excludeId) {
+            whereCondition = or(
+                ilike(schema.classes.name, name),
+                eq(schema.classes.name, name.toLowerCase()),
+                eq(schema.classes.name, name.toUpperCase()),
+            );
+            // Query and filter manually for excludeId
+            const existingClasses = await this.db.query.classes.findMany({
+                where: whereCondition,
+            });
+            return existingClasses.find(c => c.id !== excludeId) || null;
+        }
+        const [existingClass] = await this.db.query.classes.findMany({
+            where: or(
+                ilike(schema.classes.name, name),
+                eq(schema.classes.name, name.toLowerCase()),
+                eq(schema.classes.name, name.toUpperCase()),
+            ),
+        });
+        return existingClass || null;
+    }
+
     async getCourses(classId: number) {
         const courses = await this.db
             .select({
@@ -69,11 +94,21 @@ export class ClassesService {
     }
 
     async create(name: string) {
+        // Check if class with same name already exists
+        const existingClass = await this.findByName(name);
+        if (existingClass) {
+            throw new ConflictException('Class with this name already exists');
+        }
         const [classItem] = await this.db.insert(schema.classes).values({ name }).returning();
         return classItem;
     }
 
     async update(id: number, name: string) {
+        // Check if class with same name already exists (excluding current id)
+        const existingClass = await this.findByName(name, id);
+        if (existingClass) {
+            throw new ConflictException('Class with this name already exists');
+        }
         const [classItem] = await this.db
             .update(schema.classes)
             .set({ name })

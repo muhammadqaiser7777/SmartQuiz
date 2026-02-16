@@ -107,6 +107,18 @@ export class ClassesComponent implements OnInit {
     saveClass() {
         if (!this.formName.trim()) return;
 
+        // Frontend validation: Check for duplicate name
+        const trimmedName = this.formName.trim().toLowerCase();
+        const duplicateClass = this.classes.find(c => 
+            c.name.toLowerCase() === trimmedName && 
+            c.id !== this.editingId
+        );
+        
+        if (duplicateClass) {
+            this.toastService.error('A class with this name already exists');
+            return;
+        }
+
         if (this.editingId) {
             this.classesService.updateClass(this.editingId, this.formName).subscribe({
                 next: (updatedClass) => {
@@ -121,7 +133,12 @@ export class ClassesComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Error updating class:', err);
-                    this.toastService.error('Failed to update class');
+                    // Handle duplicate name error from backend
+                    if (err.status === 409) {
+                        this.toastService.error('A class with this name already exists');
+                    } else {
+                        this.toastService.error('Failed to update class');
+                    }
                 }
             });
         } else {
@@ -134,7 +151,12 @@ export class ClassesComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Error creating class:', err);
-                    this.toastService.error('Failed to create class');
+                    // Handle duplicate name error from backend
+                    if (err.status === 409) {
+                        this.toastService.error('A class with this name already exists');
+                    } else {
+                        this.toastService.error('Failed to create class');
+                    }
                 }
             });
         }
