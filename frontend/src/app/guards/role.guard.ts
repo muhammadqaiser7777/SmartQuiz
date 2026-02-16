@@ -7,7 +7,6 @@ export const roleGuard: CanActivateFn = (route, state) => {
     const authService = inject(AuthService);
     const expectedRoles = route.data['roles'] as string[];
 
-    // Check if user is logged in and token is not expired
     if (!authService.isLoggedIn()) {
         router.navigate(['/login']);
         return false;
