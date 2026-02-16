@@ -117,6 +117,19 @@
     cursor: pointer;
 }
 
+.manage-courses-btn {
+    padding: 8px 16px;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.manage-courses-btn:hover {
+    background: #7c3aed;
+}
+
 .delete-btn {
     padding: 8px 16px;
     background: #ef4444;

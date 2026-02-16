@@ -22,6 +22,18 @@ export class ClassesService {
         return classItem;
     }
 
+    async getCourses(classId: number) {
+        const courses = await this.db
+            .select({
+                courseId: schema.courses.id,
+                courseName: schema.courses.name,
+            })
+            .from(schema.classCourses)
+            .innerJoin(schema.courses, eq(schema.classCourses.courseId, schema.courses.id))
+            .where(eq(schema.classCourses.classId, classId));
+        return courses;
+    }
+
     async create(name: string) {
         const [classItem] = await this.db.insert(schema.classes).values({ name }).returning();
         return classItem;

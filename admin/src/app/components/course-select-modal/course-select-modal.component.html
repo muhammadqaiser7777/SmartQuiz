@@ -1,0 +1,84 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Manage Courses - {{ className }}</h3>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Assign New Course Button -->
+            <div class="action-bar">
+                <button class="assign-btn" (click)="openAssignModal()"
+                    [disabled]="loadingAll || (allCourses.length === assignedCourses.length)">
+                    + Assign New Course
+                </button>
+            </div>
+
+            <!-- Assigned Courses List -->
+            <div class="assigned-courses">
+                <h4>Assigned Courses ({{ assignedCourses.length }})</h4>
+                <div class="loading-state" *ngIf="loadingAssigned">
+                    <p>Loading...</p>
+                </div>
+                <div class="courses-list" *ngIf="!loadingAssigned && assignedCourses.length > 0">
+                    <div class="course-item" *ngFor="let course of assignedCourses">
+                        <span class="course-name">{{ course.courseName }}</span>
+                        <button class="unassign-btn" (click)="unassignCourse(course.courseId)">Unassign</button>
+                    </div>
+                </div>
+                <div class="empty-state" *ngIf="!loadingAssigned && assignedCourses.length === 0">
+                    <p>No courses assigned to this class yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Course Modal -->
+<div class="modal-overlay" *ngIf="showAssignModal" (click)="closeAssignModal()">
+    <div class="modal-content assign-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Assign Courses to {{ className }}</h3>
+            <button class="close-btn" (click)="closeAssignModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Search -->
+            <div class="search-bar">
+                <input type="text" [(ngModel)]="searchTerm" (input)="searchCourses()" placeholder="Search courses..."
+                    class="search-input">
+            </div>
+
+            <!-- Course Selection List -->
+            <div class="course-selection-list">
+                <div class="loading-state" *ngIf="loadingAll">
+                    <p>Loading courses...</p>
+                </div>
+                <div *ngIf="!loadingAll">
+                    <div class="course-select-item" *ngFor="let course of filteredCourses"
+                        [class.selected]="isCourseSelected(course.id)" (click)="toggleCourseSelection(course.id)">
+                        <input type="checkbox" [checked]="isCourseSelected(course.id)"
+                            (click)="$event.stopPropagation()" (change)="toggleCourseSelection(course.id)">
+                        <span class="course-name">{{ course.name }}</span>
+                    </div>
+                    <div class="empty-state" *ngIf="filteredCourses.length === 0">
+                        <p>No courses found.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Count -->
+            <div class="selection-info">
+                <span>{{ selectedCourseIds.length }} course(s) selected</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="cancel-btn" (click)="closeAssignModal()">Cancel</button>
+            <button class="submit-btn" (click)="assignSelectedCourses()"
+                [disabled]="selectedCourseIds.length === 0 || loading">
+                {{ loading ? 'Assigning...' : 'Assign Selected' }}
+            </button>
+        </div>
+    </div>
+</div>

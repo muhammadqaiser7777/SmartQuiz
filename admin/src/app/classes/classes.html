@@ -36,9 +36,14 @@
                 <span class="item-name">{{ cls.name }}</span>
             </div>
             <div class="item-actions">
+                <button class="manage-courses-btn" (click)="openCourseModal(cls)">Manage Courses</button>
                 <button class="edit-btn" (click)="editClass(cls)">Edit</button>
                 <button class="delete-btn" (click)="deleteClass(cls.id)">Delete</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Course Selection Modal -->
+<app-course-select-modal *ngIf="showCourseModal" [classId]="selectedClassId!" [className]="selectedClassName"
+    (close)="closeCourseModal()" (coursesUpdated)="onCoursesUpdated()"></app-course-select-modal>

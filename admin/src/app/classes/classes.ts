@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClassesService, Class } from '../services/classes.service';
 import { ToastService } from '../services/toast.service';
+import { CourseSelectModalComponent } from '../components/course-select-modal/course-select-modal.component';
 
 @Component({
     selector: 'app-classes',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, CourseSelectModalComponent],
     templateUrl: './classes.html',
     styleUrl: './classes.css'
 })
@@ -18,6 +19,11 @@ export class ClassesComponent implements OnInit {
     editingId: number | null = null;
     loading = false;
     error: string | null = null;
+
+    // Modal state
+    showCourseModal = false;
+    selectedClassId: number | null = null;
+    selectedClassName: string = '';
 
     constructor(
         private classesService: ClassesService,
@@ -116,5 +122,21 @@ export class ClassesComponent implements OnInit {
                 }
             });
         }
+    }
+
+    openCourseModal(cls: Class) {
+        this.selectedClassId = cls.id;
+        this.selectedClassName = cls.name;
+        this.showCourseModal = true;
+    }
+
+    closeCourseModal() {
+        this.showCourseModal = false;
+        this.selectedClassId = null;
+        this.selectedClassName = '';
+    }
+
+    onCoursesUpdated() {
+        // Optionally refresh data or show notification
     }
 }

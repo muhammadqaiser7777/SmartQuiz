@@ -8,11 +8,17 @@ export interface Class {
     name: string;
 }
 
+export interface ClassCourse {
+    courseId: number;
+    courseName: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class ClassesService {
     private apiUrl = 'http://localhost:2001/admin/classes';
+    private assignmentsUrl = 'http://localhost:2001/admin/assignments';
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -37,5 +43,20 @@ export class ClassesService {
 
     deleteClass(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    }
+
+    assignCourseToClass(courseId: number, classId: number): Observable<any> {
+        return this.http.post(`${this.assignmentsUrl}/course-to-class`, { courseId, classId }, { headers: this.getHeaders() });
+    }
+
+    unassignCourseFromClass(courseId: number, classId: number): Observable<any> {
+        return this.http.delete(`${this.assignmentsUrl}/course-to-class`, {
+            headers: this.getHeaders(),
+            body: { courseId, classId }
+        });
+    }
+
+    getClassCourses(classId: number): Observable<ClassCourse[]> {
+        return this.http.get<ClassCourse[]>(`${this.apiUrl}/${classId}/courses`, { headers: this.getHeaders() });
     }
 }

@@ -15,6 +15,11 @@ export class ClassesController {
         return this.classesService.findOne(id);
     }
 
+    @Get(':id/courses')
+    async getCourses(@Param('id', ParseIntPipe) id: number) {
+        return this.classesService.getCourses(id);
+    }
+
     @Post()
     async create(@Body('name') name: string) {
         return this.classesService.create(name);
