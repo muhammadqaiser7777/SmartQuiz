@@ -1,6 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -14,6 +15,7 @@ export class LoginComponent implements OnInit {
     errorMessage = signal<string>('');
     private router = inject(Router);
     private route = inject(ActivatedRoute);
+    private authService = inject(AuthService);
 
     ngOnInit() {
         this.route.queryParams.subscribe(params => {
@@ -40,6 +42,9 @@ export class LoginComponent implements OnInit {
                 };
 
                 localStorage.setItem('user', JSON.stringify(user));
+
+                // Restart token check after successful login
+                this.authService.restartTokenCheck();
 
                 if (role === 'teacher') {
                     this.router.navigate(['/teacher-dashboard']);

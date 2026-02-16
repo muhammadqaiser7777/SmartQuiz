@@ -14,7 +14,12 @@ export class LoginComponent {
   loginData = { username: '', password: '' };
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) {
+    // If user is already logged in with valid token, redirect to dashboard
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 
   validateForm(): boolean {
     // Check if fields are non-empty
