@@ -67,7 +67,7 @@
         </div>
         <div class="modal-body">
             <div class="assignments-header">
-                <button class="btn-primary" (click)="openAddAssignmentModal()">Assign</button>
+                <button class="btn-primary" (click)="openAddAssignmentModal()">New Assign</button>
             </div>
 
             <div *ngIf="loadingAssignments" class="loading">Loading assignments...</div>
@@ -111,24 +111,33 @@
         </div>
         <div class="modal-body">
             <div class="form-group">
-                <label>Search Class</label>
-                <input type="text" class="form-control" placeholder="Type to search class..."
-                    [(ngModel)]="classSearchTerm" (input)="searchClasses()" (focus)="showClassSuggestions = true">
-                <div class="suggestions-dropdown" *ngIf="showClassSuggestions && filteredClasses.length > 0">
-                    <div *ngFor="let cls of filteredClasses" class="suggestion-item" (click)="selectClass(cls)">
-                        {{ cls.name }}
+                <label>Select Class</label>
+                <div class="combobox-container">
+                    <input type="text" class="form-control" placeholder="Search or select class..."
+                        [(ngModel)]="classSearchTerm" (input)="filterClasses()" (focus)="onClassFocus()"
+                        autocomplete="off">
+                    <div class="suggestions-dropdown" *ngIf="showClassSuggestions">
+                        <div *ngIf="filteredClasses.length === 0" class="no-results">No classes found</div>
+                        <div *ngFor="let cls of filteredClasses" class="suggestion-item"
+                            [class.selected]="cls.id === selectedClassId" (mousedown)="selectClass(cls)">
+                            {{ cls.name }}
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Search Course</label>
-                <input type="text" class="form-control" placeholder="Type to search course..."
-                    [(ngModel)]="courseSearchTerm" (input)="searchCourses()" (focus)="showCourseSuggestions = true"
-                    [disabled]="!selectedClassId">
-                <div class="suggestions-dropdown" *ngIf="showCourseSuggestions && filteredCourses.length > 0">
-                    <div *ngFor="let course of filteredCourses" class="suggestion-item" (click)="selectCourse(course)">
-                        {{ course.name }}
+                <label>Select Course</label>
+                <div class="combobox-container">
+                    <input type="text" class="form-control" placeholder="Search or select course..."
+                        [(ngModel)]="courseSearchTerm" (input)="filterCourses()" (focus)="onCourseFocus()"
+                        [disabled]="!selectedClassId" autocomplete="off">
+                    <div class="suggestions-dropdown" *ngIf="showCourseSuggestions && selectedClassId">
+                        <div *ngIf="filteredCourses.length === 0" class="no-results">No courses found</div>
+                        <div *ngFor="let course of filteredCourses" class="suggestion-item"
+                            [class.selected]="course.id === selectedCourseId" (mousedown)="selectCourse(course)">
+                            {{ course.name }}
+                        </div>
                     </div>
                 </div>
             </div>

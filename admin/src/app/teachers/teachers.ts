@@ -212,6 +212,7 @@ export class TeachersComponent implements OnInit {
         this.teacherAssignmentsService.getAvailableClasses().subscribe({
             next: (classes) => {
                 this.availableClasses = classes;
+                this.filteredClasses = classes; // Show all classes by default
                 this.cdr.detectChanges();
             },
             error: (err) => console.error('Error loading classes:', err)
@@ -231,6 +232,33 @@ export class TeachersComponent implements OnInit {
             .filter(cls => cls.name.toLowerCase().includes(term))
             .slice(0, 3);
         this.showClassSuggestions = this.filteredClasses.length > 0;
+    }
+
+    filterClasses() {
+        const term = this.classSearchTerm.toLowerCase();
+
+        if (!term) {
+            // Show all classes when no search term
+            this.filteredClasses = [...this.availableClasses];
+        } else {
+            // Filter classes based on search term
+            this.filteredClasses = this.availableClasses
+                .filter(cls => cls.name.toLowerCase().includes(term));
+        }
+        this.showClassSuggestions = this.filteredClasses.length > 0;
+    }
+
+    onClassFocus() {
+        // Show all classes when focusing on the input
+        this.filteredClasses = [...this.availableClasses];
+        this.showClassSuggestions = true;
+    }
+
+    onClassBlur() {
+        // Delay hiding to allow click on suggestion
+        setTimeout(() => {
+            this.showClassSuggestions = false;
+        }, 200);
     }
 
     searchCourses() {
@@ -256,6 +284,52 @@ export class TeachersComponent implements OnInit {
             },
             error: (err) => console.error('Error loading courses:', err)
         });
+    }
+
+    filterCourses() {
+        if (!this.selectedClassId) {
+            return;
+        }
+
+        const term = this.courseSearchTerm.toLowerCase();
+
+        // Load courses for the selected class and filter
+        this.teacherAssignmentsService.getCoursesByClass(this.selectedClassId).subscribe({
+            next: (courses) => {
+                if (!term) {
+                    // Show all courses when no search term
+                    this.filteredCourses = courses;
+                } else {
+                    this.filteredCourses = courses
+                        .filter(course => course.name.toLowerCase().includes(term));
+                }
+                this.showCourseSuggestions = this.filteredCourses.length > 0;
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error loading courses:', err)
+        });
+    }
+
+    onCourseFocus() {
+        if (!this.selectedClassId) {
+            return;
+        }
+        // Load all courses when focusing on the input
+        this.teacherAssignmentsService.getCoursesByClass(this.selectedClassId).subscribe({
+            next: (courses) => {
+                this.filteredCourses = courses;
+                this.showCourseSuggestions = true;
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error loading courses:', err)
+        });
+    }
+
+    onCourseBlur() {
+        // Delay hiding to allow click on suggestion
+        setTimeout(() => {
+            this.showCourseSuggestions = false;
+        }, 200);
     }
 
     selectClass(cls: ClassOption) {

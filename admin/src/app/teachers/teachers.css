@@ -258,6 +258,7 @@ tbody tr:hover {
 }
 
 .form-group {
+    position: relative;
     margin-bottom: 20px;
 }
 
@@ -295,6 +296,10 @@ tbody tr:hover {
 }
 
 /* Autocomplete Styles */
+.combobox-container {
+    position: relative;
+}
+
 .suggestions-dropdown {
     position: absolute;
     top: 100%;
@@ -304,7 +309,7 @@ tbody tr:hover {
     border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 0 4px 4px;
-    max-height: 180px;
+    max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -325,9 +330,14 @@ tbody tr:hover {
     background-color: #f5f5f5;
 }
 
-.form-group {
-    position: relative;
-    margin-bottom: 20px;
+.suggestion-item.selected {
+    background-color: #e3f2fd;
+}
+
+.no-results {
+    padding: 12px 15px;
+    color: #999;
+    font-style: italic;
 }
 
 .selected-info {
