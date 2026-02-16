@@ -1,0 +1,67 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Manage Class - {{ studentName }}</h3>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Current Class Status -->
+            <div class="current-class-section">
+                <h4>Current Class</h4>
+                <div class="current-class-info" *ngIf="currentClassId">
+                    <span class="class-badge">{{ currentClassName }}</span>
+                    <button class="remove-btn" (click)="removeClass()" [disabled]="loading">
+                        Remove
+                    </button>
+                </div>
+                <div class="no-class" *ngIf="!currentClassId">
+                    <p>No class assigned to this student.</p>
+                </div>
+            </div>
+
+            <!-- Assign/Change Class Section -->
+            <div class="assign-section">
+                <h4>{{ currentClassId ? 'Change Class' : 'Assign Class' }}</h4>
+
+                <!-- Search -->
+                <div class="search-bar">
+                    <input type="text" [(ngModel)]="searchTerm" (input)="searchClasses()"
+                        placeholder="Search classes..." class="search-input">
+                </div>
+
+                <!-- Class Selection List -->
+                <div class="class-selection-list">
+                    <div class="loading-state" *ngIf="loadingClasses">
+                        <p>Loading classes...</p>
+                    </div>
+                    <div *ngIf="!loadingClasses">
+                        <div class="class-select-item" *ngFor="let cls of filteredClasses"
+                            [class.selected]="isClassSelected(cls.id)" [class.current]="isCurrentClass(cls.id)"
+                            (click)="selectClass(cls.id)">
+                            <input type="radio" [checked]="isClassSelected(cls.id)" (click)="$event.stopPropagation()"
+                                (change)="selectClass(cls.id)">
+                            <span class="class-name">{{ cls.name }}</span>
+                            <span class="current-label" *ngIf="isCurrentClass(cls.id)">(Current)</span>
+                        </div>
+                        <div class="empty-state" *ngIf="filteredClasses.length === 0">
+                            <p>No classes found.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Info -->
+                <div class="selection-info" *ngIf="selectedClassId">
+                    <span>Selected: {{ getSelectedClassName() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+            <button class="submit-btn" (click)="assignClass()" [disabled]="!selectedClassId || loading">
+                {{ loading ? 'Assigning...' : (currentClassId ? 'Change Class' : 'Assign Class') }}
+            </button>
+        </div>
+    </div>
+</div>

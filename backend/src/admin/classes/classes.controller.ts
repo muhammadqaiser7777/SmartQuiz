@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 
 @Controller('admin/classes')
@@ -6,8 +6,15 @@ export class ClassesController {
     constructor(private readonly classesService: ClassesService) { }
 
     @Get()
-    async findAll() {
-        return this.classesService.findAll();
+    async findAll(
+        @Query('page') page: string = '1',
+        @Query('limit') limit: string = '20',
+        @Query('search') search: string = '',
+    ) {
+        const pageNum = parseInt(page, 10) || 1;
+        const limitNum = parseInt(limit, 10) || 20;
+        const searchTerm = search || undefined;
+        return this.classesService.findAll(pageNum, limitNum, searchTerm);
     }
 
     @Get(':id')

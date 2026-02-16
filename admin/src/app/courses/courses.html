@@ -4,6 +4,13 @@
         <button class="create-btn" (click)="showCreateForm()">+ Create Course</button>
     </div>
 
+    <!-- Search -->
+    <div class="search-container">
+        <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="search()" placeholder="Search courses..."
+            class="search-input">
+        <button class="search-btn" (click)="search()">Search</button>
+    </div>
+
     <!-- Create/Edit Form -->
     <div class="form-container" *ngIf="showForm">
         <input type="text" [(ngModel)]="formName" placeholder="Enter course name" class="form-input">
@@ -39,6 +46,19 @@
                 <button class="edit-btn" (click)="editCourse(course)">Edit</button>
                 <button class="delete-btn" (click)="deleteCourse(course.id)">Delete</button>
             </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+                Previous
+            </button>
+            <span class="pagination-info">
+                Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} items)
+            </span>
+            <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                Next
+            </button>
         </div>
     </div>
 </div>

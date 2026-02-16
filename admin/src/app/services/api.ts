@@ -3,21 +3,23 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Teacher {
-    id: number;
+    id: string;
     name: string;
     email: string;
     profilePicture?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | null;
+    updatedAt: Date | null;
 }
 
 export interface Student {
-    id: number;
+    id: string;
     name: string;
     email: string;
     profilePicture?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    classId: number | null;
+    className: string | null;
 }
 
 @Injectable({

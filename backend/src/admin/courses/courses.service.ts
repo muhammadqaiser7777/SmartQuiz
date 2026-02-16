@@ -1,7 +1,15 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
 
 @Injectable()
 export class CoursesService {
@@ -10,8 +18,34 @@ export class CoursesService {
         private db: NodePgDatabase<typeof schema>,
     ) { }
 
-    async findAll() {
-        return await this.db.query.courses.findMany();
+    async findAll(page: number = 1, limit: number = 20, search?: string): Promise<PaginatedResponse<any>> {
+        const offset = (page - 1) * limit;
+
+        // Build where condition for search
+        let whereCondition: any = undefined;
+        if (search) {
+            whereCondition = ilike(schema.courses.name, `%${search}%`);
+        }
+
+        // Get total count
+        const countResult = whereCondition
+            ? await this.db.select({ count: schema.courses.id }).from(schema.courses).where(whereCondition)
+            : await this.db.select({ count: schema.courses.id }).from(schema.courses);
+        const total = countResult.length;
+
+        const courses = await this.db.query.courses.findMany({
+            where: whereCondition,
+            limit,
+            offset,
+        });
+
+        return {
+            data: courses,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 
     async findOne(id: number) {

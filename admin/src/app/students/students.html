@@ -4,8 +4,9 @@
     </div>
 
     <div class="search-section">
-        <input type="text" class="search-input" placeholder="Search students...">
-        <button class="btn-secondary">Search</button>
+        <input type="text" class="search-input" placeholder="Search students..." [(ngModel)]="searchTerm"
+            (keyup.enter)="search()">
+        <button class="btn-secondary" (click)="search()">Search</button>
     </div>
 
     <div class="students-table">
@@ -17,6 +18,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Class</th>
                     <th>Profile Picture</th>
                     <th>Created At</th>
                     <th>Actions</th>
@@ -24,11 +26,15 @@
             </thead>
             <tbody>
                 <tr *ngIf="students.length === 0">
-                    <td colspan="5" class="no-data">No students found. Click "Add New Student" to get started.</td>
+                    <td colspan="6" class="no-data">No students found.</td>
                 </tr>
                 <tr *ngFor="let student of students">
                     <td>{{ student.name }}</td>
                     <td>{{ student.email }}</td>
+                    <td>
+                        <span *ngIf="student.classId" class="class-badge">{{ student.className }}</span>
+                        <span *ngIf="!student.classId" class="no-class">Not assigned</span>
+                    </td>
                     <td>
                         <img *ngIf="student.profilePicture" [src]="student.profilePicture" alt="Profile"
                             class="profile-pic">
@@ -36,11 +42,32 @@
                     </td>
                     <td>{{ student.createdAt | date:'short' }}</td>
                     <td>
-                        <button class="btn-action">View</button>
+                        <button class="btn-action" (click)="openClassModal(student)">
+                            {{ student.classId ? 'Change Class' : 'Assign Class' }}
+                        </button>
                         <button class="btn-action btn-danger">Delete</button>
                     </td>
                 </tr>
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+                Previous
+            </button>
+            <span class="pagination-info">
+                Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} items)
+            </span>
+            <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                Next
+            </button>
+        </div>
     </div>
 </div>
+
+<!-- Class Select Modal -->
+<app-class-select-modal *ngIf="showClassModal" [studentId]="selectedStudent!.id" [studentName]="selectedStudent!.name"
+    [currentClassId]="selectedStudent!.classId" [currentClassName]="selectedStudent!.className"
+    (close)="closeClassModal()" (classAssigned)="onClassAssigned($event)">
+</app-class-select-modal>

@@ -19,6 +19,15 @@ export class CoursesComponent implements OnInit {
     loading = false;
     error: string | null = null;
 
+    // Pagination
+    currentPage = 1;
+    totalPages = 1;
+    totalItems = 0;
+    limit = 20;
+
+    // Search
+    searchTerm = '';
+
     constructor(
         private coursesService: CoursesService,
         private toastService: ToastService,
@@ -32,9 +41,11 @@ export class CoursesComponent implements OnInit {
     loadCourses() {
         this.loading = true;
         this.error = null;
-        this.coursesService.getCourses().subscribe({
-            next: (data) => {
-                this.courses = data;
+        this.coursesService.getCourses(this.currentPage, this.limit, this.searchTerm).subscribe({
+            next: (response) => {
+                this.courses = response.data;
+                this.totalPages = response.totalPages;
+                this.totalItems = response.total;
                 this.loading = false;
                 this.cdr.detectChanges();
             },
@@ -46,6 +57,26 @@ export class CoursesComponent implements OnInit {
                 this.toastService.error('Failed to load courses');
             }
         });
+    }
+
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+            this.currentPage = page;
+            this.loadCourses();
+        }
+    }
+
+    nextPage() {
+        this.goToPage(this.currentPage + 1);
+    }
+
+    prevPage() {
+        this.goToPage(this.currentPage - 1);
+    }
+
+    search() {
+        this.currentPage = 1;
+        this.loadCourses();
     }
 
     showCreateForm() {

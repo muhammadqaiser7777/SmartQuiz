@@ -1,13 +1,22 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Teacher } from '../services/api';
 import { AuthService } from '../services/auth';
 
+interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
 @Component({
     selector: 'app-teachers',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './teachers.html',
     styleUrls: ['./teachers.css']
 })
@@ -28,6 +37,15 @@ export class TeachersComponent implements OnInit {
     loading = true;
     error: string | null = null;
 
+    // Pagination
+    currentPage = 1;
+    totalPages = 1;
+    totalItems = 0;
+    limit = 20;
+
+    // Search
+    searchTerm = '';
+
     ngOnInit() {
         this.loadTeachers();
     }
@@ -45,11 +63,18 @@ export class TeachersComponent implements OnInit {
             return;
         }
 
-        this.http.get<Teacher[]>(`${this.apiUrl}/teachers`, {
+        let url = `${this.apiUrl}/teachers?page=${this.currentPage}&limit=${this.limit}`;
+        if (this.searchTerm) {
+            url += `&search=${encodeURIComponent(this.searchTerm)}`;
+        }
+
+        this.http.get<PaginatedResponse<Teacher>>(url, {
             headers: this.getHeaders()
         }).subscribe({
-            next: (data) => {
-                this.teachers = data;
+            next: (response) => {
+                this.teachers = response.data;
+                this.totalPages = response.totalPages;
+                this.totalItems = response.total;
                 this.loading = false;
                 this.cdr.detectChanges();
             },
@@ -62,5 +87,25 @@ export class TeachersComponent implements OnInit {
                 this.cdr.detectChanges();
             }
         });
+    }
+
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+            this.currentPage = page;
+            this.loadTeachers();
+        }
+    }
+
+    nextPage() {
+        this.goToPage(this.currentPage + 1);
+    }
+
+    prevPage() {
+        this.goToPage(this.currentPage - 1);
+    }
+
+    search() {
+        this.currentPage = 1;
+        this.loadTeachers();
     }
 }

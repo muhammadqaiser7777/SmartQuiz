@@ -20,6 +20,15 @@ export class ClassesComponent implements OnInit {
     loading = false;
     error: string | null = null;
 
+    // Pagination
+    currentPage = 1;
+    totalPages = 1;
+    totalItems = 0;
+    limit = 20;
+
+    // Search
+    searchTerm = '';
+
     // Modal state
     showCourseModal = false;
     selectedClassId: number | null = null;
@@ -38,10 +47,12 @@ export class ClassesComponent implements OnInit {
     loadClasses() {
         this.loading = true;
         this.error = null;
-        this.classesService.getClasses().subscribe({
-            next: (data) => {
+        this.classesService.getClasses(this.currentPage, this.limit, this.searchTerm).subscribe({
+            next: (response) => {
 
-                this.classes = data;
+                this.classes = response.data;
+                this.totalPages = response.totalPages;
+                this.totalItems = response.total;
                 this.loading = false;
                 this.cdr.detectChanges();
             },
@@ -53,6 +64,26 @@ export class ClassesComponent implements OnInit {
                 this.toastService.error('Failed to load classes');
             }
         });
+    }
+
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+            this.currentPage = page;
+            this.loadClasses();
+        }
+    }
+
+    nextPage() {
+        this.goToPage(this.currentPage + 1);
+    }
+
+    prevPage() {
+        this.goToPage(this.currentPage - 1);
+    }
+
+    search() {
+        this.currentPage = 1;
+        this.loadClasses();
     }
 
     showCreateForm() {

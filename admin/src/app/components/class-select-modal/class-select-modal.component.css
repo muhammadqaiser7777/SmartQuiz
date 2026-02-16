@@ -1,0 +1,268 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.close-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.current-class-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.current-class-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.current-class-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.class-badge {
+    background: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.remove-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.remove-btn:hover:not(:disabled) {
+    background: #da190b;
+}
+
+.remove-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.no-class {
+    text-align: center;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.no-class p {
+    margin: 0;
+    color: #999;
+}
+
+.assign-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.search-bar {
+    margin-bottom: 16px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.class-selection-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.class-select-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.class-select-item:last-child {
+    border-bottom: none;
+}
+
+.class-select-item:hover {
+    background: #f9f9f9;
+}
+
+.class-select-item.selected {
+    background: #e8f5e9;
+}
+
+.class-select-item.current {
+    background: #fff3e0;
+}
+
+.class-select-item input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.class-name {
+    font-size: 14px;
+    color: #333;
+    flex: 1;
+}
+
+.current-label {
+    font-size: 12px;
+    color: #ff9800;
+    font-weight: 500;
+}
+
+.selection-info {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.empty-state p {
+    margin: 0;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 20px;
+    color: #6366f1;
+}
+
+.loading-state p {
+    margin: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #eee;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cancel-btn:hover {
+    background: #eeeeee;
+}
+
+.submit-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #45a049;
+}
+
+.submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

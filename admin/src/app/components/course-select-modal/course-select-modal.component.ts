@@ -59,10 +59,10 @@ export class CourseSelectModalComponent implements OnInit {
 
     loadAllCourses() {
         this.loadingAll = true;
-        this.coursesService.getCourses().subscribe({
-            next: (courses) => {
-                this.allCourses = courses;
-                this.filteredCourses = courses;
+        this.coursesService.getCourses(1, 100).subscribe({
+            next: (response) => {
+                this.allCourses = response.data;
+                this.filteredCourses = response.data;
                 this.loadingAll = false;
                 this.cdr.detectChanges();
             },

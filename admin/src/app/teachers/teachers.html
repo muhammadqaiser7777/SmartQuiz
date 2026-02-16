@@ -4,8 +4,8 @@
     </div>
 
     <div class="search-section">
-        <input type="text" class="search-input" placeholder="Search teachers...">
-        <button class="btn-secondary">Search</button>
+        <input type="text" class="search-input" placeholder="Search teachers..." [(ngModel)]="searchTerm" (keyup.enter)="search()">
+        <button class="btn-secondary" (click)="search()">Search</button>
     </div>
 
     <div class="teachers-table">
@@ -24,7 +24,7 @@
             </thead>
             <tbody>
                 <tr *ngIf="teachers.length === 0">
-                    <td colspan="5" class="no-data">No teachers found. Click "Add New Teacher" to get started.</td>
+                    <td colspan="5" class="no-data">No teachers found.</td>
                 </tr>
                 <tr *ngFor="let teacher of teachers">
                     <td>{{ teacher.name }}</td>
@@ -42,5 +42,18 @@
                 </tr>
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+                Previous
+            </button>
+            <span class="pagination-info">
+                Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} items)
+            </span>
+            <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                Next
+            </button>
+        </div>
     </div>
 </div>

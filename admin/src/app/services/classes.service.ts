@@ -13,6 +13,14 @@ export interface ClassCourse {
     courseName: string;
 }
 
+interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -29,8 +37,12 @@ export class ClassesService {
         });
     }
 
-    getClasses(): Observable<Class[]> {
-        return this.http.get<Class[]>(this.apiUrl, { headers: this.getHeaders() });
+    getClasses(page: number = 1, limit: number = 20, search: string = ''): Observable<PaginatedResponse<Class>> {
+        let url = `${this.apiUrl}?page=${page}&limit=${limit}`;
+        if (search) {
+            url += `&search=${encodeURIComponent(search)}`;
+        }
+        return this.http.get<PaginatedResponse<Class>>(url, { headers: this.getHeaders() });
     }
 
     createClass(name: string): Observable<Class> {
