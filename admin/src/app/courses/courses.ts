@@ -39,7 +39,7 @@ export class CoursesComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading courses:', err); 
+                console.error('Error loading courses:', err);
                 this.error = 'Failed to load courses';
                 this.loading = false;
                 this.cdr.detectChanges();
@@ -76,7 +76,9 @@ export class CoursesComponent implements OnInit {
                     if (index !== -1) {
                         this.courses[index] = updatedCourse;
                     }
-                    this.cancelForm();
+                    this.formName = '';
+                    this.editingId = null;
+                    this.cdr.detectChanges();
                     this.toastService.success('Course updated successfully');
                 },
                 error: (err) => {
@@ -88,7 +90,8 @@ export class CoursesComponent implements OnInit {
             this.coursesService.createCourse(this.formName).subscribe({
                 next: (newCourse) => {
                     this.courses = [...this.courses, newCourse];
-                    this.cancelForm();
+                    this.formName = '';
+                    this.cdr.detectChanges();
                     this.toastService.success('Course created successfully');
                 },
                 error: (err) => {

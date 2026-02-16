@@ -77,7 +77,9 @@ export class ClassesComponent implements OnInit {
                     if (index !== -1) {
                         this.classes[index] = updatedClass;
                     }
-                    this.cancelForm();
+                    this.formName = '';
+                    this.editingId = null;
+                    this.cdr.detectChanges();
                     this.toastService.success('Class updated successfully');
                 },
                 error: (err) => {
@@ -89,7 +91,8 @@ export class ClassesComponent implements OnInit {
             this.classesService.createClass(this.formName).subscribe({
                 next: (newClass) => {
                     this.classes = [...this.classes, newClass];
-                    this.cancelForm();
+                    this.formName = '';
+                    this.cdr.detectChanges();
                     this.toastService.success('Class created successfully');
                 },
                 error: (err) => {
