@@ -13,6 +13,8 @@ import { TeachersController } from './teachers/teachers.controller';
 import { TeachersService } from './teachers/teachers.service';
 import { StudentsController } from './students/students.controller';
 import { StudentsService } from './students/students.service';
+import { TeacherAssignmentsController } from './teacher-assignments/teacher-assignments.controller';
+import { TeacherAssignmentsService } from './teacher-assignments/teacher-assignments.service';
 
 @Module({
     imports: [
@@ -27,7 +29,8 @@ import { StudentsService } from './students/students.service';
         ClassesController,
         AssignmentsController,
         TeachersController,
-        StudentsController
+        StudentsController,
+        TeacherAssignmentsController
     ],
     providers: [
         AdminService,
@@ -35,7 +38,8 @@ import { StudentsService } from './students/students.service';
         ClassesService,
         AssignmentsService,
         TeachersService,
-        StudentsService
+        StudentsService,
+        TeacherAssignmentsService
     ],
 })
 export class AdminModule {
@@ -49,7 +53,8 @@ export class AdminModule {
                 ClassesController,
                 AssignmentsController,
                 TeachersController,
-                StudentsController
+                StudentsController,
+                TeacherAssignmentsController
             );
     }
 }

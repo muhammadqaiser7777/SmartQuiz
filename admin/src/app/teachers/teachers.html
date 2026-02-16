@@ -4,7 +4,8 @@
     </div>
 
     <div class="search-section">
-        <input type="text" class="search-input" placeholder="Search teachers..." [(ngModel)]="searchTerm" (keyup.enter)="search()">
+        <input type="text" class="search-input" placeholder="Search teachers..." [(ngModel)]="searchTerm"
+            (keyup.enter)="search()">
         <button class="btn-secondary" (click)="search()">Search</button>
     </div>
 
@@ -36,8 +37,7 @@
                     </td>
                     <td>{{ teacher.createdAt | date:'short' }}</td>
                     <td>
-                        <button class="btn-action">View</button>
-                        <button class="btn-action btn-danger">Delete</button>
+                        <button class="btn-action" (click)="openManageModal(teacher)">Manage</button>
                     </td>
                 </tr>
             </tbody>
@@ -54,6 +54,96 @@
             <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
                 Next
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Teacher Assignments Modal -->
+<div class="modal-overlay" *ngIf="showManageModal" (click)="closeManageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Manage Assignments - {{ selectedTeacher?.name }}</h3>
+            <button class="close-btn" (click)="closeManageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="assignments-header">
+                <button class="btn-primary" (click)="openAddAssignmentModal()">Assign</button>
+            </div>
+
+            <div *ngIf="loadingAssignments" class="loading">Loading assignments...</div>
+
+            <div class="assignments-list" *ngIf="!loadingAssignments">
+                <div *ngIf="teacherAssignments.length === 0" class="no-data">
+                    No assignments found. Click "Assign" to assign a class and course.
+                </div>
+
+                <table *ngIf="teacherAssignments.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Course</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let assignment of teacherAssignments">
+                            <td>{{ assignment.className }}</td>
+                            <td>{{ assignment.courseName }}</td>
+                            <td>
+                                <button class="btn-action" (click)="openEditAssignmentModal(assignment)">Edit</button>
+                                <button class="btn-action btn-danger"
+                                    (click)="deleteAssignment(assignment)">Remove</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Assignment Modal -->
+<div class="modal-overlay" *ngIf="showAssignmentModal" (click)="closeAssignmentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ editingAssignment ? 'Edit Assignment' : 'Assign Teacher' }}</h3>
+            <button class="close-btn" (click)="closeAssignmentModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Search Class</label>
+                <input type="text" class="form-control" placeholder="Type to search class..."
+                    [(ngModel)]="classSearchTerm" (input)="searchClasses()" (focus)="showClassSuggestions = true">
+                <div class="suggestions-dropdown" *ngIf="showClassSuggestions && filteredClasses.length > 0">
+                    <div *ngFor="let cls of filteredClasses" class="suggestion-item" (click)="selectClass(cls)">
+                        {{ cls.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Search Course</label>
+                <input type="text" class="form-control" placeholder="Type to search course..."
+                    [(ngModel)]="courseSearchTerm" (input)="searchCourses()" (focus)="showCourseSuggestions = true"
+                    [disabled]="!selectedClassId">
+                <div class="suggestions-dropdown" *ngIf="showCourseSuggestions && filteredCourses.length > 0">
+                    <div *ngFor="let course of filteredCourses" class="suggestion-item" (click)="selectCourse(course)">
+                        {{ course.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="selected-info" *ngIf="selectedClassId && selectedCourseId">
+                <p>Selected: <strong>{{ selectedClassName }}</strong> - <strong>{{ selectedCourseName }}</strong></p>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-secondary" (click)="closeAssignmentModal()">Cancel</button>
+                <button class="btn-primary" (click)="saveAssignment()"
+                    [disabled]="!selectedClassId || !selectedCourseId || savingAssignment">
+                    {{ savingAssignment ? 'Saving...' : (editingAssignment ? 'Update' : 'Assign') }}
+                </button>
+            </div>
         </div>
     </div>
 </div>
