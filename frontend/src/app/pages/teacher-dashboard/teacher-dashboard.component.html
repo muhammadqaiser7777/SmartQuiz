@@ -8,105 +8,65 @@
 
     <div class="content-section">
         <div class="section-header">
-            <h2>My Courses</h2>
-            <button class="btn-primary">Create New Course</button>
+            <h2>My Classes & Courses</h2>
         </div>
 
-        <div class="courses-grid">
-            <div class="course-card">
-                <div class="card-header">
-                    <h3>Mathematics 101</h3>
-                    <span class="badge">Active</span>
-                </div>
-                <p class="card-description">Introduction to Algebra and Calculus</p>
-                <div class="card-stats">
-                    <div class="stat">
-                        <span class="stat-label">Students</span>
-                        <span class="stat-value">45</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Assignments</span>
-                        <span class="stat-value">12</span>
-                    </div>
-                </div>
-                <button class="btn-secondary">View Details</button>
-            </div>
-
-            <div class="course-card">
-                <div class="card-header">
-                    <h3>Physics 201</h3>
-                    <span class="badge">Active</span>
-                </div>
-                <p class="card-description">Advanced Physics Concepts</p>
-                <div class="card-stats">
-                    <div class="stat">
-                        <span class="stat-label">Students</span>
-                        <span class="stat-value">32</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Assignments</span>
-                        <span class="stat-value">8</span>
-                    </div>
-                </div>
-                <button class="btn-secondary">View Details</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <div class="section-header">
-            <h2>Recent Assignments</h2>
-            <button class="btn-primary">Create Assignment</button>
+        <div *ngIf="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Loading assignments...</p>
         </div>
 
-        <div class="table-container">
+        <div *ngIf="error" class="error-message">
+            <p>{{ error }}</p>
+            <button class="btn-primary" (click)="loadAssignments()">Retry</button>
+        </div>
+
+        <div *ngIf="!loading && !error && assignments.length === 0" class="empty-state">
+            <p>No classes or courses assigned yet.</p>
+        </div>
+
+        <div *ngIf="!loading && !error && assignments.length > 0" class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Assignment</th>
+                        <th>Class</th>
                         <th>Course</th>
-                        <th>Due Date</th>
-                        <th>Submissions</th>
-                        <th>Status</th>
+                        <th>Total Students</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Midterm Exam</td>
-                        <td>Mathematics 101</td>
-                        <td>2026-02-20</td>
-                        <td>35/45</td>
-                        <td><span class="status-badge active">Active</span></td>
+                    <tr *ngFor="let assignment of assignments">
+                        <td class="class-name">{{ assignment.className }}</td>
+                        <td class="course-name">{{ assignment.courseName }}</td>
+                        <td class="student-count">{{ assignment.totalStudents }}</td>
                         <td>
-                            <button class="btn-action">View</button>
-                            <button class="btn-action">Grade</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Lab Report 3</td>
-                        <td>Physics 201</td>
-                        <td>2026-02-18</td>
-                        <td>28/32</td>
-                        <td><span class="status-badge active">Active</span></td>
-                        <td>
-                            <button class="btn-action">View</button>
-                            <button class="btn-action">Grade</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Quiz 5</td>
-                        <td>Mathematics 101</td>
-                        <td>2026-02-15</td>
-                        <td>45/45</td>
-                        <td><span class="status-badge completed">Completed</span></td>
-                        <td>
-                            <button class="btn-action">View</button>
-                            <button class="btn-action">Grade</button>
+                            <button class="btn-action" (click)="viewDetails(assignment)">
+                                View Details
+                            </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div *ngIf="!loading && !error && totalPages > 1" class="pagination">
+            <button class="pagination-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+                Previous
+            </button>
+
+            <button *ngFor="let page of getPageNumbers()" class="pagination-btn" [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+                {{ page }}
+            </button>
+
+            <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+                Next
+            </button>
+        </div>
+
+        <div *ngIf="!loading && !error && totalAssignments > 0" class="pagination-info">
+            <p>Showing {{ assignments.length }} of {{ totalAssignments }} assignments</p>
         </div>
     </div>
 </div>

@@ -1,16 +1,16 @@
-import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import Joi from 'joi';
 
-export class LoginDto {
-    @IsString()
-    @IsNotEmpty({ message: 'Username is required' })
-    username!: string;
+export const loginSchema = Joi.object({
+    username: Joi.string().required().messages({
+        'any.required': 'Username is required',
+    }),
+    password: Joi.string().min(8).required().messages({
+        'any.required': 'Password is required',
+        'string.min': 'Password must be at least 8 characters long',
+    }),
+});
 
-    @IsString()
-    @IsNotEmpty({ message: 'Password is required' })
-    // Example: Enforcing a minimum length and complexity for the login attempt
-    @MinLength(8, { message: 'Password must be at least 8 characters long' })
-    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-        message: 'Password must contain uppercase, lowercase, and a number',
-    })
-    password!: string;
-}
+export type LoginDto = {
+    username: string;
+    password: string;
+};

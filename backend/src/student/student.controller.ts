@@ -1,10 +1,20 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { StudentJwtAuthGuard } from '../auth/guards/student-jwt.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller('admin/students') // <--- Changed to match your Angular api.ts
+interface RequestWithUser extends Request {
+    user: {
+        sub: string;
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+    };
+}
+
+@Controller('student')
 export class StudentController {
     constructor(private readonly studentService: StudentService) { }
 
@@ -15,9 +25,10 @@ export class StudentController {
 
     // Keep your protected routes as they are
     @Get('profile')
-    @UseGuards(JwtAuthGuard, RoleGuard)
+    @UseGuards(StudentJwtAuthGuard, RoleGuard)
     @Roles('student')
-    getProfile() {
-        return { message: 'Welcome Student! This is a protected endpoint.' };
+    getProfile(@Request() req: RequestWithUser) {
+        const studentId = req.user.sub || req.user.id;
+        return { message: 'Welcome Student! This is a protected endpoint.', studentId };
     }
 }

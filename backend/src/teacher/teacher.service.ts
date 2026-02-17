@@ -1,9 +1,28 @@
-import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { OAuthLoginDto } from '../auth/dto/oauth-login.dto';
 import { AuthService } from '../auth/auth.service';
+
+export interface TeacherAssignmentWithCount {
+    id: number;
+    classId: number;
+    courseId: number;
+    teacherId: string;
+    className: string;
+    courseName: string;
+    totalStudents: number;
+    createdAt: Date;
+}
+
+export interface PaginatedTeacherAssignments {
+    data: TeacherAssignmentWithCount[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
 
 @Injectable()
 export class TeacherService {
@@ -68,6 +87,115 @@ export class TeacherService {
                 profilePicture: teacher.profilePicture,
             },
             ...token,
+        };
+    }
+
+    async getMyAssignments(teacherId: string, page: number = 1, limit: number = 10): Promise<PaginatedTeacherAssignments> {
+        console.log('getMyAssignments: Looking for teacher with ID:', teacherId);
+
+        // Check if teacher exists
+        const [teacher] = await this.db.query.teachers.findMany({
+            where: eq(schema.teachers.id, teacherId),
+        });
+
+        if (!teacher) {
+            console.log('getMyAssignments: Teacher not found for ID:', teacherId);
+            throw new NotFoundException('Teacher not found');
+        }
+
+        console.log('getMyAssignments: Teacher found:', teacher.name);
+
+        // Get total count
+        const allAssignments = await this.db.query.classCourseTeacher.findMany({
+            where: eq(schema.classCourseTeacher.teacherId, teacherId),
+        });
+
+        const total = allAssignments.length;
+        const totalPages = Math.ceil(total / limit);
+        const offset = (page - 1) * limit;
+
+        // Get paginated assignments
+        const assignments = await this.db.query.classCourseTeacher.findMany({
+            where: eq(schema.classCourseTeacher.teacherId, teacherId),
+            limit: limit,
+            offset: offset,
+        });
+
+        // Get class and course details and student count for each assignment
+        const result: TeacherAssignmentWithCount[] = [];
+        for (const assignment of assignments) {
+            const [classItem] = await this.db.query.classes.findMany({
+                where: eq(schema.classes.id, assignment.classId),
+            });
+            const [course] = await this.db.query.courses.findMany({
+                where: eq(schema.courses.id, assignment.courseId),
+            });
+
+            // Count students in this class-course combination
+            const students = await this.db.query.classCourseStudent.findMany({
+                where: and(
+                    eq(schema.classCourseStudent.classId, assignment.classId),
+                    eq(schema.classCourseStudent.courseId, assignment.courseId)
+                ),
+            });
+
+            result.push({
+                id: assignment.id,
+                classId: assignment.classId,
+                courseId: assignment.courseId,
+                teacherId: assignment.teacherId,
+                className: classItem?.name || 'Unknown Class',
+                courseName: course?.name || 'Unknown Course',
+                totalStudents: students.length,
+                createdAt: new Date(),
+            });
+        }
+
+        return {
+            data: result,
+            total,
+            page,
+            limit,
+            totalPages,
+        };
+    }
+
+    async getAssignmentById(assignmentId: number, teacherId: string): Promise<TeacherAssignmentWithCount | null> {
+        const [assignment] = await this.db.query.classCourseTeacher.findMany({
+            where: and(
+                eq(schema.classCourseTeacher.id, assignmentId),
+                eq(schema.classCourseTeacher.teacherId, teacherId)
+            ),
+        });
+
+        if (!assignment) {
+            return null;
+        }
+
+        const [classItem] = await this.db.query.classes.findMany({
+            where: eq(schema.classes.id, assignment.classId),
+        });
+        const [course] = await this.db.query.courses.findMany({
+            where: eq(schema.courses.id, assignment.courseId),
+        });
+
+        // Count students in this class-course combination
+        const students = await this.db.query.classCourseStudent.findMany({
+            where: and(
+                eq(schema.classCourseStudent.classId, assignment.classId),
+                eq(schema.classCourseStudent.courseId, assignment.courseId)
+            ),
+        });
+
+        return {
+            id: assignment.id,
+            classId: assignment.classId,
+            courseId: assignment.courseId,
+            teacherId: assignment.teacherId,
+            className: classItem?.name || 'Unknown Class',
+            courseName: course?.name || 'Unknown Course',
+            totalStudents: students.length,
+            createdAt: new Date(),
         };
     }
 
