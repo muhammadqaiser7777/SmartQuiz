@@ -39,7 +39,6 @@ export class TeacherDashboardComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error loading assignments:', err);
         this.error = 'Failed to load assignments. Please try again.';
         this.loading = false;
       }

@@ -57,7 +57,6 @@ export class ClassesComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading classes:', err);
                 this.error = 'Failed to load classes';
                 this.loading = false;
                 this.cdr.detectChanges();
@@ -109,11 +108,11 @@ export class ClassesComponent implements OnInit {
 
         // Frontend validation: Check for duplicate name
         const trimmedName = this.formName.trim().toLowerCase();
-        const duplicateClass = this.classes.find(c => 
-            c.name.toLowerCase() === trimmedName && 
+        const duplicateClass = this.classes.find(c =>
+            c.name.toLowerCase() === trimmedName &&
             c.id !== this.editingId
         );
-        
+
         if (duplicateClass) {
             this.toastService.error('A class with this name already exists');
             return;
@@ -132,7 +131,6 @@ export class ClassesComponent implements OnInit {
                     this.toastService.success('Class updated successfully');
                 },
                 error: (err) => {
-                    console.error('Error updating class:', err);
                     // Handle duplicate name error from backend
                     if (err.status === 409) {
                         this.toastService.error('A class with this name already exists');
@@ -150,7 +148,6 @@ export class ClassesComponent implements OnInit {
                     this.toastService.success('Class created successfully');
                 },
                 error: (err) => {
-                    console.error('Error creating class:', err);
                     // Handle duplicate name error from backend
                     if (err.status === 409) {
                         this.toastService.error('A class with this name already exists');
@@ -170,7 +167,6 @@ export class ClassesComponent implements OnInit {
                     this.toastService.success('Class deleted successfully');
                 },
                 error: (err) => {
-                    console.error('Error deleting class:', err);
                     this.toastService.error('Failed to delete class');
                 }
             });

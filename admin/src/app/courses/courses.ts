@@ -50,7 +50,6 @@ export class CoursesComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading courses:', err);
                 this.error = 'Failed to load courses';
                 this.loading = false;
                 this.cdr.detectChanges();
@@ -125,7 +124,6 @@ export class CoursesComponent implements OnInit {
                     this.toastService.success('Course updated successfully');
                 },
                 error: (err) => {
-                    console.error('Error updating course:', err);
                     // Handle duplicate name error from backend
                     if (err.status === 409) {
                         this.toastService.error('A course with this name already exists');
@@ -143,7 +141,6 @@ export class CoursesComponent implements OnInit {
                     this.toastService.success('Course created successfully');
                 },
                 error: (err) => {
-                    console.error('Error creating course:', err);
                     // Handle duplicate name error from backend
                     if (err.status === 409) {
                         this.toastService.error('A course with this name already exists');
@@ -163,7 +160,6 @@ export class CoursesComponent implements OnInit {
                     this.toastService.success('Course deleted successfully');
                 },
                 error: (err) => {
-                    console.error('Error deleting course:', err);
                     this.toastService.error('Failed to delete course');
                 }
             });

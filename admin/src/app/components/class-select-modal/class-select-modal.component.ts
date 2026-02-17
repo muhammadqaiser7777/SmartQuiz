@@ -60,7 +60,6 @@ export class ClassSelectModalComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading classes:', err);
                 this.toastService.error('Failed to load classes');
                 this.loadingClasses = false;
                 this.cdr.detectChanges();
@@ -115,7 +114,6 @@ export class ClassSelectModalComponent implements OnInit {
                 this.loading = false;
             },
             error: (err) => {
-                console.error('Error assigning class:', err);
                 this.toastService.error('Failed to assign class');
                 this.loading = false;
             }
@@ -134,7 +132,6 @@ export class ClassSelectModalComponent implements OnInit {
                     this.loading = false;
                 },
                 error: (err) => {
-                    console.error('Error removing class:', err);
                     this.toastService.error('Failed to remove class');
                     this.loading = false;
                 }

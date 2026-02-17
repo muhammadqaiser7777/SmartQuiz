@@ -1,0 +1,139 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ quizTitle }}</h2>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Loading State -->
+            <div *ngIf="loading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading quiz details...</p>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="error" class="error-message">
+                {{ error }}
+            </div>
+
+            <!-- Content -->
+            <div *ngIf="!loading && !error && quizDetails">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Questions</h3>
+                        <p class="stat-value">{{ totalQuestions }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Marks</h3>
+                        <p class="stat-value">{{ totalMarks }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Submissions</h3>
+                        <p class="stat-value">{{ totalSubmissions }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Average Marks</h3>
+                        <p class="stat-value">{{ averageMarks }}</p>
+                    </div>
+                </div>
+
+                <!-- Time Info -->
+                <div class="time-info">
+                    <div class="time-item">
+                        <span class="label">Start Time:</span>
+                        <span class="value">{{ formatDateTime(startTime) }}</span>
+                    </div>
+                    <div class="time-item">
+                        <span class="label">End Time:</span>
+                        <span class="value">{{ formatDateTime(endTime) }}</span>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn" [class.active]="activeTab === 'details'" (click)="setActiveTab('details')">
+                        Quiz Questions
+                    </button>
+                    <button class="tab-btn" [class.active]="activeTab === 'leaderboard'"
+                        (click)="setActiveTab('leaderboard')">
+                        Leaderboard
+                    </button>
+                </div>
+
+                <!-- Questions Tab -->
+                <div *ngIf="activeTab === 'details'" class="tab-content">
+                    <div *ngIf="quizQuestions.length === 0" class="empty-state">
+                        No questions in this quiz.
+                    </div>
+                    <div *ngFor="let question of quizQuestions; let i = index" class="question-card">
+                        <div class="question-header">
+                            <span class="question-number">Q{{ i + 1 }}</span>
+                            <span class="correct-badge">Correct: {{ getCorrectAnswerLabel(question.correctOption)
+                                }}</span>
+                        </div>
+                        <p class="question-text">{{ question.question }}</p>
+                        <div class="options-list">
+                            <div class="option" [class.correct]="question.correctOption === '1'">
+                                <span class="option-label">A:</span> {{ question.optionA }}
+                            </div>
+                            <div class="option" [class.correct]="question.correctOption === '2'">
+                                <span class="option-label">B:</span> {{ question.optionB }}
+                            </div>
+                            <div class="option" [class.correct]="question.correctOption === '3'">
+                                <span class="option-label">C:</span> {{ question.optionC }}
+                            </div>
+                            <div class="option" [class.correct]="question.correctOption === '4'">
+                                <span class="option-label">D:</span> {{ question.optionD }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Tab -->
+                <div *ngIf="activeTab === 'leaderboard'" class="tab-content">
+                    <div *ngIf="leaderboard.length === 0" class="empty-state">
+                        No submissions yet.
+                    </div>
+                    <table *ngIf="leaderboard.length > 0" class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Marks</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let entry of leaderboard">
+                                <td>
+                                    <span class="rank" [class.top-3]="entry.rank <= 3">
+                                        {{ entry.rank }}
+                                    </span>
+                                </td>
+                                <td>{{ entry.studentName }}</td>
+                                <td>{{ entry.studentEmail }}</td>
+                                <td>{{ entry.obtainedMarks }} / {{ entry.totalMarks }}</td>
+                                <td>
+                                    <span class="percentage" [class.high]="entry.percentage >= 70"
+                                        [class.medium]="entry.percentage >= 40 && entry.percentage < 70"
+                                        [class.low]="entry.percentage < 40">
+                                        {{ entry.percentage }}%
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

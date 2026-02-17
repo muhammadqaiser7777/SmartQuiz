@@ -35,10 +35,65 @@
                 </div>
             </div>
 
-            <div class="placeholder-content">
-                <p>Class Course Dashboard - Coming Soon</p>
-                <p class="subtitle">This is a blank dashboard for the class-course combination.</p>
+            <!-- Quiz Section -->
+            <div class="quiz-section">
+                <div class="section-header">
+                    <h2>Quizzes</h2>
+                    <button class="btn btn-primary" (click)="openQuizModal()">
+                        + Create Quiz
+                    </button>
+                </div>
+
+                <div *ngIf="quizzes.length === 0" class="empty-state">
+                    <p>No quizzes created yet.</p>
+                    <p class="subtitle">Click "Create Quiz" to add a new quiz.</p>
+                </div>
+
+                <div *ngIf="quizzes.length > 0" class="quiz-list">
+                    <table class="quiz-table">
+                        <thead>
+                            <tr>
+                                <th>Quiz Title</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Questions</th>
+                                <th>Total Marks</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let quiz of quizzes">
+                                <td>{{ quiz.title }}</td>
+                                <td>{{ formatDateTime(quiz.startTime) }}</td>
+                                <td>{{ formatDateTime(quiz.endTime) }}</td>
+                                <td>{{ quiz.totalQuestions }}</td>
+                                <td>{{ quiz.totalMarks }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="isQuizActive(quiz)"
+                                        [class.expired]="isQuizExpired(quiz)">
+                                        {{ getQuizStatus(quiz) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-view" (click)="openViewModal(quiz.id)">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Quiz Create Modal -->
+    <app-quiz-create-modal *ngIf="showQuizModal" [classId]="assignment?.classId || 0"
+        [courseId]="assignment?.courseId || 0" (close)="closeQuizModal()"
+        (quizCreated)="onQuizCreated($event)"></app-quiz-create-modal>
+
+    <!-- Quiz View Modal -->
+    <app-quiz-view-modal *ngIf="showViewModal" [quizId]="selectedQuizId"
+        (close)="closeViewModal()"></app-quiz-view-modal>
 </div>

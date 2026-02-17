@@ -91,7 +91,6 @@ export class TeachersComponent implements OnInit {
         if (!token) {
             this.error = 'Not authenticated. Please login first.';
             this.loading = false;
-            console.error('No token found');
             this.cdr.detectChanges();
             return;
         }
@@ -112,7 +111,6 @@ export class TeachersComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading teachers:', err);
                 this.error = err.status === 401
                     ? 'Unauthorized. Please login again.'
                     : 'Failed to load teachers';
@@ -166,7 +164,6 @@ export class TeachersComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading assignments:', err);
                 this.loadingAssignments = false;
                 this.cdr.detectChanges();
             }
@@ -215,7 +212,7 @@ export class TeachersComponent implements OnInit {
                 this.filteredClasses = classes; // Show all classes by default
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading classes:', err)
+            error: (err) => { }
         });
     }
 
@@ -282,7 +279,7 @@ export class TeachersComponent implements OnInit {
                 this.showCourseSuggestions = this.filteredCourses.length > 0;
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading courses:', err)
+            error: (err) => { }
         });
     }
 
@@ -306,7 +303,7 @@ export class TeachersComponent implements OnInit {
                 this.showCourseSuggestions = this.filteredCourses.length > 0;
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading courses:', err)
+            error: (err) => { }
         });
     }
 
@@ -321,7 +318,7 @@ export class TeachersComponent implements OnInit {
                 this.showCourseSuggestions = true;
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading courses:', err)
+            error: (err) => { }
         });
     }
 
@@ -367,7 +364,7 @@ export class TeachersComponent implements OnInit {
                 this.filteredCourses = courses;
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading courses:', err)
+            error: (err) => { }
         });
     }
 
@@ -391,7 +388,6 @@ export class TeachersComponent implements OnInit {
                     this.cdr.detectChanges();
                 },
                 error: (err) => {
-                    console.error('Error updating assignment:', err);
                     this.savingAssignment = false;
                     this.cdr.detectChanges();
                 }
@@ -410,7 +406,6 @@ export class TeachersComponent implements OnInit {
                     this.cdr.detectChanges();
                 },
                 error: (err) => {
-                    console.error('Error creating assignment:', err);
                     this.savingAssignment = false;
                     this.cdr.detectChanges();
                 }
@@ -429,7 +424,6 @@ export class TeachersComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error deleting assignment:', err);
                 this.cdr.detectChanges();
             }
         });

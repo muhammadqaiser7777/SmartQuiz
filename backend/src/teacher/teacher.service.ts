@@ -1,9 +1,27 @@
 import { Injectable, Inject, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { OAuthLoginDto } from '../auth/dto/oauth-login.dto';
 import { AuthService } from '../auth/auth.service';
+import { CreateQuizDto, QuizWithQuestions, QuizListQueryDto } from './dto/quiz.dto';
+
+export interface QuizLeaderboardEntry {
+    studentId: string;
+    studentName: string;
+    studentEmail: string;
+    obtainedMarks: number;
+    totalMarks: number;
+    percentage: number;
+    rank: number;
+}
+
+export interface QuizDetailsWithLeaderboard {
+    quiz: QuizWithQuestions;
+    leaderboard: QuizLeaderboardEntry[];
+    totalSubmissions: number;
+    averageMarks: number;
+}
 
 export interface TeacherAssignmentWithCount {
     id: number;
@@ -233,6 +251,308 @@ export class TeacherService {
                 name: teacher.name,
                 email: teacher.email,
             },
+        };
+    }
+
+    // ==================== QUIZ METHODS ====================
+
+    /**
+     * Create a new quiz with questions
+     * Times are received as ISO 8601 strings (timezone-aware) and stored in UTC
+     */
+    async createQuiz(teacherId: string, quizData: CreateQuizDto) {
+        // Verify teacher exists
+        const [teacher] = await this.db.query.teachers.findMany({
+            where: eq(schema.teachers.id, teacherId),
+        });
+
+        if (!teacher) {
+            throw new NotFoundException('Teacher not found');
+        }
+
+        // Verify class belongs to teacher
+        const [classAssignment] = await this.db.query.classCourseTeacher.findMany({
+            where: and(
+                eq(schema.classCourseTeacher.teacherId, teacherId),
+                eq(schema.classCourseTeacher.classId, quizData.classId),
+                eq(schema.classCourseTeacher.courseId, quizData.courseId)
+            ),
+        });
+
+        if (!classAssignment) {
+            throw new ForbiddenException('You are not assigned to this class and course');
+        }
+
+        // Parse and convert timezone-aware times to UTC
+        const startTime = new Date(quizData.startTime);
+        const endTime = new Date(quizData.endTime);
+
+        // Validate times
+        if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+            throw new ForbiddenException('Invalid start or end time format');
+        }
+
+        if (endTime <= startTime) {
+            throw new ForbiddenException('End time must be after start time');
+        }
+
+        // Calculate marks per question
+        const totalQuestions = quizData.questions.length;
+        if (totalQuestions === 0) {
+            throw new ForbiddenException('At least one question is required');
+        }
+
+        const marksPerQuestion = Math.floor(quizData.totalMarks / totalQuestions);
+
+        // Create quiz with questions in a transaction
+        const [quiz] = await this.db.insert(schema.quizzes).values({
+            courseId: quizData.courseId,
+            teacherId: teacherId,
+            title: quizData.title,
+            startTime: startTime, // Stored in UTC in database
+            endTime: endTime,       // Stored in UTC in database
+            classId: quizData.classId,
+            totalQuestions: totalQuestions,
+            totalMarks: quizData.totalMarks,
+        }).returning();
+
+        // Insert all questions
+        const questionsToInsert = quizData.questions.map(q => ({
+            quizId: quiz.id,
+            question: q.question,
+            optionA: q.optionA,
+            optionB: q.optionB,
+            optionC: q.optionC,
+            optionD: q.optionD,
+            correctOption: q.correctOption,
+        }));
+
+        const questions = await this.db.insert(schema.questions).values(questionsToInsert).returning();
+
+        return {
+            message: 'Quiz created successfully',
+            quiz: {
+                id: quiz.id,
+                title: quiz.title,
+                startTime: quiz.startTime.toISOString(),
+                endTime: quiz.endTime.toISOString(),
+                totalQuestions: quiz.totalQuestions,
+                totalMarks: quiz.totalMarks,
+                classId: quiz.classId,
+                courseId: quiz.courseId,
+            },
+            questions: questions.map(q => ({
+                id: q.id,
+                question: q.question,
+                optionA: q.optionA,
+                optionB: q.optionB,
+                optionC: q.optionC,
+                optionD: q.optionD,
+                correctOption: q.correctOption,
+                marks: marksPerQuestion,
+            })),
+        };
+    }
+
+    /**
+     * Get all quizzes for a teacher with optional filtering
+     */
+    async getQuizzes(teacherId: string, query: QuizListQueryDto) {
+        const { page, limit, classId, courseId } = query;
+        const offset = (page - 1) * limit;
+
+        // Build where conditions
+        const conditions = [eq(schema.quizzes.teacherId, teacherId)];
+        if (classId) {
+            conditions.push(eq(schema.quizzes.classId, classId));
+        }
+        if (courseId) {
+            conditions.push(eq(schema.quizzes.courseId, courseId));
+        }
+
+        // Get total count
+        const allQuizzes = await this.db.query.quizzes.findMany({
+            where: and(...conditions),
+        });
+
+        const total = allQuizzes.length;
+        const totalPages = Math.ceil(total / limit);
+
+        // Get paginated quizzes
+        const quizzes = await this.db.query.quizzes.findMany({
+            where: and(...conditions),
+            limit: limit,
+            offset: offset,
+            orderBy: (quizzes, { desc }) => [desc(quizzes.startTime)],
+        });
+
+        // Get class and course names for each quiz
+        const result = await Promise.all(quizzes.map(async (quiz) => {
+            const classId = quiz.classId ?? 0;
+            const courseId = quiz.courseId ?? 0;
+
+            const [classItem] = await this.db.query.classes.findMany({
+                where: eq(schema.classes.id, classId),
+            });
+            const [course] = await this.db.query.courses.findMany({
+                where: eq(schema.courses.id, courseId),
+            });
+
+            return {
+                id: quiz.id,
+                title: quiz.title,
+                startTime: quiz.startTime?.toISOString() ?? '',
+                endTime: quiz.endTime?.toISOString() ?? '',
+                totalQuestions: quiz.totalQuestions ?? 0,
+                totalMarks: quiz.totalMarks ?? 0,
+                classId: classId,
+                className: classItem?.name || 'Unknown Class',
+                courseId: courseId,
+                courseName: course?.name || 'Unknown Course',
+            };
+        }));
+
+        return {
+            data: result,
+            total,
+            page,
+            limit,
+            totalPages,
+        };
+    }
+
+    /**
+     * Get a single quiz with all questions
+     */
+    async getQuizById(teacherId: string, quizId: string): Promise<QuizWithQuestions | null> {
+        const [quiz] = await this.db.query.quizzes.findMany({
+            where: and(
+                eq(schema.quizzes.id, quizId),
+                eq(schema.quizzes.teacherId, teacherId)
+            ),
+        });
+
+        if (!quiz) {
+            return null;
+        }
+
+        // Get all questions for this quiz
+        const quizQuestions = await this.db.query.questions.findMany({
+            where: eq(schema.questions.quizId, quizId),
+        });
+
+        return {
+            id: quiz.id,
+            courseId: quiz.courseId!,
+            teacherId: quiz.teacherId!,
+            title: quiz.title!,
+            startTime: quiz.startTime!,
+            endTime: quiz.endTime!,
+            classId: quiz.classId!,
+            totalQuestions: quiz.totalQuestions!,
+            totalMarks: quiz.totalMarks!,
+            questions: quizQuestions.map(q => ({
+                id: q.id,
+                quizId: q.quizId!,
+                question: q.question!,
+                optionA: q.optionA!,
+                optionB: q.optionB!,
+                optionC: q.optionC!,
+                optionD: q.optionD!,
+                correctOption: q.correctOption!,
+            })),
+        };
+    }
+
+    /**
+     * Get quiz details with leaderboard
+     */
+    async getQuizDetailsWithLeaderboard(teacherId: string, quizId: string): Promise<QuizDetailsWithLeaderboard | null> {
+        // First verify the quiz belongs to this teacher
+        const [quiz] = await this.db.query.quizzes.findMany({
+            where: and(
+                eq(schema.quizzes.id, quizId),
+                eq(schema.quizzes.teacherId, teacherId)
+            ),
+        });
+
+        if (!quiz) {
+            return null;
+        }
+
+        // Get all questions for this quiz
+        const quizQuestions = await this.db.query.questions.findMany({
+            where: eq(schema.questions.quizId, quizId),
+        });
+
+        // Get all marks for this quiz
+        const quizMarks = await this.db.query.marks.findMany({
+            where: eq(schema.marks.quizId, quizId),
+        });
+
+        // Build leaderboard with student details
+        const leaderboard: QuizLeaderboardEntry[] = [];
+        let totalObtainedMarks = 0;
+
+        for (let i = 0; i < quizMarks.length; i++) {
+            const mark = quizMarks[i];
+            const [student] = await this.db.query.students.findMany({
+                where: eq(schema.students.id, mark.studentId),
+            });
+
+            const percentage = mark.totalMarks > 0
+                ? Math.round((mark.obtainedMarks / mark.totalMarks) * 100)
+                : 0;
+
+            leaderboard.push({
+                studentId: mark.studentId,
+                studentName: student?.name || 'Unknown Student',
+                studentEmail: student?.email || '',
+                obtainedMarks: mark.obtainedMarks,
+                totalMarks: mark.totalMarks,
+                percentage,
+                rank: 0, // Will be set after sorting
+            });
+
+            totalObtainedMarks += mark.obtainedMarks;
+        }
+
+        // Sort by obtained marks descending and assign ranks
+        leaderboard.sort((a, b) => b.obtainedMarks - a.obtainedMarks);
+        leaderboard.forEach((entry, index) => {
+            entry.rank = index + 1;
+        });
+
+        // Calculate average marks
+        const averageMarks = quizMarks.length > 0
+            ? Math.round(totalObtainedMarks / quizMarks.length)
+            : 0;
+
+        return {
+            quiz: {
+                id: quiz.id,
+                courseId: quiz.courseId!,
+                teacherId: quiz.teacherId!,
+                title: quiz.title!,
+                startTime: quiz.startTime!,
+                endTime: quiz.endTime!,
+                classId: quiz.classId!,
+                totalQuestions: quiz.totalQuestions!,
+                totalMarks: quiz.totalMarks!,
+                questions: quizQuestions.map(q => ({
+                    id: q.id,
+                    quizId: q.quizId!,
+                    question: q.question!,
+                    optionA: q.optionA!,
+                    optionB: q.optionB!,
+                    optionC: q.optionC!,
+                    optionD: q.optionD!,
+                    correctOption: q.correctOption!,
+                })),
+            },
+            leaderboard,
+            totalSubmissions: quizMarks.length,
+            averageMarks,
         };
     }
 }

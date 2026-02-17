@@ -63,7 +63,6 @@ export class StudentsComponent implements OnInit {
         if (!token) {
             this.error = 'Not authenticated. Please login first.';
             this.loading = false;
-            console.error('No token found');
             this.cdr.detectChanges();
             return;
         }
@@ -86,7 +85,6 @@ export class StudentsComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading students:', err);
                 this.error = err.status === 401
                     ? 'Unauthorized. Please login again.'
                     : 'Failed to load students';

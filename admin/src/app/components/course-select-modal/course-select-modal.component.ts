@@ -49,7 +49,6 @@ export class CourseSelectModalComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading assigned courses:', err);
                 this.toastService.error('Failed to load assigned courses');
                 this.loadingAssigned = false;
                 this.cdr.detectChanges();
@@ -67,7 +66,6 @@ export class CourseSelectModalComponent implements OnInit {
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('Error loading courses:', err);
                 this.toastService.error('Failed to load courses');
                 this.loadingAll = false;
                 this.cdr.detectChanges();
@@ -118,7 +116,6 @@ export class CourseSelectModalComponent implements OnInit {
             this.coursesUpdated.emit();
             this.loading = false;
         }).catch((err) => {
-            console.error('Error assigning courses:', err);
             this.toastService.error('Failed to assign courses');
             this.loading = false;
         });
@@ -133,7 +130,6 @@ export class CourseSelectModalComponent implements OnInit {
                     this.coursesUpdated.emit();
                 },
                 error: (err) => {
-                    console.error('Error unassigning course:', err);
                     this.toastService.error('Failed to unassign course');
                 }
             });
